@@ -2,16 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
+const productsController = require('../controllers/products')
+
 const products = [{title: "Great book"}];
 
 // /admin/add-product => GET
-router.get('/add-product', (req, res, next) => {
-  // res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
-  res.render('add-product', {
-    myActivePath: 'on-admin-page',
-    docTitle: 'Add product'
-  });
-});
+router.get('/add-product', productsController.getAddProduct);
 
 // /admin/add-product => POST
 router.post('/add-product', (req, res, next) => {
