@@ -7,21 +7,21 @@ const getAddProduct = (req, res, next) => {
   });
 };
 
-const postAddProduct = (req, res, next) => {
+const postAddProduct = async (req, res, next) => {
   const newProduct = new Product(req.body.title);
-  newProduct.save();
+  await newProduct.save();
 
   res.redirect("/");
 };
 
-const deleteAllProducts = (req, res, next) => {
-  const products = Product.fetchAll(); //
-  while (products.length) products.pop(); // works, coz pass by reference
+const deleteAllProducts = async (req, res, next) => {
+  await Product.deleteAll(); //
+
   res.redirect("/");
 };
 
-const getProducts = (req, res, next) => {
-  const products = Product.fetchAll();
+const getProducts = async (req, res, next) => {
+  const products = await Product.fetchAll();
 
   res.render("shop", {
     prods: products,
