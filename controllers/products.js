@@ -1,4 +1,4 @@
-const products = [{ title: "Great book" }];
+const Product = require("../models/Product");
 
 const getAddProduct = (req, res, next) => {
   res.render("add-product", {
@@ -8,27 +8,31 @@ const getAddProduct = (req, res, next) => {
 };
 
 const postAddProduct = (req, res, next) => {
-  products.push({ title: req.body.title });
+  const newProduct = new Product(req.body.title);
+  newProduct.save();
+
   res.redirect("/");
 };
 
 const deleteAllProducts = (req, res, next) => {
-  while (products.length) products.pop();
+  const products = Product.fetchAll(); //
+  while (products.length) products.pop(); // works, coz pass by reference
   res.redirect("/");
 };
 
-const getProducts =(req, res, next) => {
-  res.render('shop', {
+const getProducts = (req, res, next) => {
+  const products = Product.fetchAll();
+
+  res.render("shop", {
     prods: products,
-    docTitle: 'My shop',
-    myActivePath: 'shop-page'
+    docTitle: "My shop",
+    myActivePath: "shop-page",
   });
-}
+};
 
 module.exports = {
   getAddProduct,
   postAddProduct,
   deleteAllProducts,
   getProducts,
-  products,
 };
