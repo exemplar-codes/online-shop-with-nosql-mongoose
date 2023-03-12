@@ -13,8 +13,7 @@ router.get('/', (req, res, next) => {
   res.render('shop', {
     prods: adminData.products,
     docTitle: 'My shop',
-    myActivePath: 'shop-page',
-    viewEngine: res.app.get('view engine')
+    myActivePath: 'shop-page'
   });
 });
 

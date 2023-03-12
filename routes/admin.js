@@ -13,8 +13,7 @@ router.get('/add-product', (req, res, next) => {
   // res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
   res.render('add-product', {
     myActivePath: 'on-admin-page',
-    docTitle: 'Add product',
-    viewEngine: res.app.get('view engine')
+    docTitle: 'Add product'
   });
 });
 
