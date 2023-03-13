@@ -61,7 +61,17 @@ class Product {
 // this runs only once, since file import are cached in Node.js
 (async () => {
   const firstProduct = new Product("An awesome book");
-  await firstProduct.save();
+  const potentialError = await firstProduct.save();
+  if (true || potentialError?.code !== "ENOENT") {
+    try {
+      await fs.mkdir(path.dirname(productDataFilePath), { recursive: true });
+      await fs.writeFile(productDataFilePath, JSON.stringify([]), {
+        encoding: "utf-8",
+      });
+    } catch (err) {
+      console.log("x", err);
+    }
+  }
 })();
 
 module.exports = Product;
