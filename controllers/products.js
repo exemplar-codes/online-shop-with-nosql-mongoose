@@ -1,7 +1,7 @@
 const Product = require("../models/Product");
 
 const getAddProduct = (req, res, next) => {
-  res.render("add-product", {
+  res.render("admin/add-product", {
     myActivePath: "on-admin-page",
     docTitle: "Add product",
   });
@@ -23,7 +23,7 @@ const deleteAllProducts = async (req, res, next) => {
 const getProducts = async (req, res, next) => {
   const products = await Product.fetchAll();
 
-  res.render("shop", {
+  res.render("shop/product-list", {
     prods: products,
     docTitle: "My shop",
     myActivePath: "shop-page",
