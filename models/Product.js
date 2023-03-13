@@ -68,8 +68,9 @@ class Product {
       await fs.writeFile(productDataFilePath, JSON.stringify([]), {
         encoding: "utf-8",
       });
+      await firstProduct.save();
     } catch (err) {
-      console.log("x", err);
+      console.log(err);
     }
   }
 })();
