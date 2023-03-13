@@ -32,10 +32,7 @@ class Product {
 
   static async fetchAll() {
     try {
-      const fileContents = await fs.readFile(
-        path.join(rootDir, "data", "products.json"),
-        { encoding: "utf-8" }
-      );
+      const fileContents = await fs.readFile(productDataFilePath);
 
       return JSON.parse(fileContents.toString());
     } catch (err) {
