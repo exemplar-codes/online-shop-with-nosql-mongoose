@@ -20,6 +20,18 @@ const deleteAllProducts = async (req, res, next) => {
   res.redirect("/");
 };
 
+const getAdminProducts = async (req, res, next) => {
+  const products = await Product.fetchAll();
+  const productsByAdmin = products.filter(() => true);
+  // add owned by a particular admin filter, later
+
+  res.render("admin/products", {
+    prods: productsByAdmin,
+    docTitle: "Admin products",
+    myActivePath: "/admin/products",
+  });
+};
+
 const getProducts = async (req, res, next) => {
   const products = await Product.fetchAll();
 
@@ -35,4 +47,5 @@ module.exports = {
   postAddProduct,
   deleteAllProducts,
   getProducts,
+  getAdminProducts,
 };

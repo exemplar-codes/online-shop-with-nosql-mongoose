@@ -7,10 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><%= docTitle %></title>
     <link rel="stylesheet" href="/css/main.css">
-    <% if (["on-admin-page"].includes(myActivePath)) { %>
+    <% if (myActivePath.includes("admin")) { %>
         <link rel="stylesheet" href="/css/forms.css">
     <% } %>
-    <% if (["on-admin-page", "shop-page"].includes(myActivePath)) { %>
+    <% if (!myActivePath.includes("404")) { %>
         <link rel="stylesheet" href="/css/product.css">
     <% } %>
 </head>
