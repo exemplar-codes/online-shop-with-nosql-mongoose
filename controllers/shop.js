@@ -26,9 +26,9 @@ const getProduct = async (req, res, next) => {
   }
 
   res.render("shop/product-detail", {
-    prods: product,
-    docTitle: req.params.productId ?? "Some product",
-    myActivePath: "/products-detail",
+    prod: product,
+    docTitle: `${req.params.productId} - ${product.title}`,
+    myActivePath: "/products",
   });
 };
 
