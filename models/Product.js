@@ -44,7 +44,7 @@ class Product {
     }
   }
 
-  static async fetch(id) {
+  static async findById(id) {
     try {
       const fileContents = await fs.readFile(productDataFilePath);
 
