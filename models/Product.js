@@ -7,9 +7,9 @@ const productDataFilePath = path.join(rootDir, "data", "products.json");
 class Product {
   constructor(
     title,
-    imageUrl = "/image/sample-image.jpg",
+    imageUrl,
     description = "No description",
-    price = -1
+    price = 19.99
   ) {
     //  deliberately ignoring id, or update for this demo.
     this.title = title;
