@@ -5,9 +5,17 @@ const rootDir = require("../util/path");
 const productDataFilePath = path.join(rootDir, "data", "products.json");
 
 class Product {
-  constructor(title) {
-    this.title = title;
+  constructor(
+    title,
+    imageUrl = "/image/sample-image.jpg",
+    description = "No description",
+    price = -1
+  ) {
     //  deliberately ignoring id, or update for this demo.
+    this.title = title;
+    this.imageUrl = imageUrl;
+    this.description = description;
+    this.price = price;
   }
 
   async save() {

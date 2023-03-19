@@ -27,7 +27,12 @@ const getEditProduct = (req, res, next) => {
 };
 
 const postAddProduct = async (req, res, next) => {
-  const newProduct = new Product(req.body.title);
+  const newProduct = new Product(
+    req.body.title,
+    req.body.imageUrl,
+    req.body.description,
+    req.body.price
+  );
   await newProduct.save();
 
   res.redirect("/");
