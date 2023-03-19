@@ -34,6 +34,13 @@ const cartPage = async (req, res, next) => {
   });
 };
 
+const ordersPage = async (req, res, next) => {
+  res.render("shop/orders", {
+    docTitle: "Orders",
+    myActivePath: "/orders",
+  });
+};
+
 const checkoutPage = async (req, res, next) => {
   res.render("shop/checkout", {
     docTitle: "Checkout",
@@ -61,4 +68,5 @@ module.exports = {
   getProduct,
   cartEditPage,
   checkoutEditPage,
+  ordersPage,
 };
