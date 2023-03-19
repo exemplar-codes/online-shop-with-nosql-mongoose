@@ -18,11 +18,16 @@ const getProducts = async (req, res, next) => {
 };
 
 const getProduct = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const product = await Product.fetch(req.params.productId, 10);
 
-  res.render("shop/product-list", {
-    prods: [products[0]],
-    docTitle: "Some product",
+  if (!product) {
+    next(); // for not found route
+    return; // end current middleware
+  }
+
+  res.render("shop/product-detail", {
+    prods: product,
+    docTitle: req.params.productId ?? "Some product",
     myActivePath: "/products-detail",
   });
 };

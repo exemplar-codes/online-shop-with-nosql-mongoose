@@ -24,9 +24,7 @@
         </p>
       </div>
       <div class="card__actions">
-        <form action="/products/<%= prod.id %>" method="POST" style="display: inline; margin: 0; padding: 0;">
-          <button type="submit" class="btn">Details</button>
-        </form>
+        <a href="/products/<%= prod.id %>"><button class="btn">Details</button></a>
         <form action="/add-to-cart/<%= prod.id %>" method="POST" style="display: inline; margin: 0; padding: 0;">
           <button type="submit" class="btn">Add to Cart</button>
         </form>

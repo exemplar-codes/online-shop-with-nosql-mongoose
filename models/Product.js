@@ -44,6 +44,18 @@ class Product {
     }
   }
 
+  static async fetch(id) {
+    try {
+      const fileContents = await fs.readFile(productDataFilePath);
+
+      const products = JSON.parse(fileContents.toString());
+
+      return products.find((item) => item.id == id) ?? null; // params are strings, funny bug
+    } catch (err) {
+      return err;
+    }
+  }
+
   static async deleteAll() {
     try {
       const products = [];
