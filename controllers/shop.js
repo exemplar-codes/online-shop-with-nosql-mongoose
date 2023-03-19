@@ -54,11 +54,16 @@ const checkoutPage = async (req, res, next) => {
 };
 
 const cartEditPage = async (req, res, next) => {
+  const prodId = req.body.productId;
+  // 1. This key is same as '<input name />' on the frontend.
+  // 2. We are using `urlencoded` middleware plugin to read form body. It's in `app` file right now.
+
+  console.log(prodId);
   // res.render("shop/checkout", {
   //   docTitle: "Checkout",
   //   myActivePath: "/checkout",
   // });
-  res.redirect("/");
+  res.redirect("/cart");
 };
 
 const checkoutEditPage = async (req, res, next) => {
