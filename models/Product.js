@@ -5,13 +5,9 @@ const rootDir = require("../util/path");
 const productDataFilePath = path.join(rootDir, "data", "products.json");
 
 class Product {
-  constructor(
-    title,
-    imageUrl,
-    description = "No description",
-    price = 19.99
-  ) {
+  constructor(title, imageUrl, description = "No description", price = 19.99) {
     //  deliberately ignoring id, or update for this demo.
+    this.id = Math.floor(Math.random() * 100);
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
