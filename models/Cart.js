@@ -65,7 +65,6 @@ class Cart {
       // update price
       cart.totalPrice -= qty * productPrice;
 
-      console.log("Done");
       // save to file
       await fs.writeFile(cartDataFilePath, JSON.stringify(cart), {
         encoding: "utf-8",
