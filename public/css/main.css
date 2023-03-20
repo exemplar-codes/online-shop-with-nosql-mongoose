@@ -23,6 +23,14 @@ form {
   text-align: center;
 }
 
+.capitalize {
+  text-transform: capitalize;
+}
+
+table * {
+  padding: 10px;
+}
+
 .main-header {
   width: 100%;
   height: 3.5rem;

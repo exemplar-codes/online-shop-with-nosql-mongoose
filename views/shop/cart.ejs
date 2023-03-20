@@ -1,4 +1,28 @@
 <%- include('../includes/head.ejs') %>
 <%- include('../includes/navigation.ejs') %>
     <h1>Cart</h1>
+    <main>
+      <% if (products.length === 0) {%>
+        <h2>No products here!</h2>
+      <% } else { %>
+        <table class="centered" border="1">
+          <thead class="capitalize">
+            <tr>
+              <% for(keyName of Object.keys(products[0])) { %>
+                <th><%= keyName %></th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <% for(prod of products) { %>
+                <% for(value of Object.values(prod)) { %>
+                  <td><%= value %></td>
+                <% } %>
+              <% } %>
+            </tr>
+          </tbody>
+        </table>
+      <% } %>
+    </main>
 <%- include('../includes/end.ejs') %>

@@ -34,9 +34,38 @@ const getProduct = async (req, res, next) => {
 };
 
 const cartPage = async (req, res, next) => {
+  const cart = await Cart.getCart();
+  const allProducts = await Product.fetchAll();
+
+  let totalPrice = 0;
+  // filter out products in cart that are present in allProducts
+  cart.products = cart.products
+    .map((cartProduct) => {
+      let existingProduct =
+        allProducts.find((item) => item.id == cartProduct.id) ?? null;
+
+      if (existingProduct) {
+        existingProduct = {
+          ...existingProduct,
+          quantity: cartProduct.quantity,
+        };
+      }
+
+      return existingProduct;
+    })
+    .filter((cartProduct) => {
+      if (cartProduct) {
+        totalPrice += cartProduct.price * cartProduct.quantity;
+      }
+
+      return cartProduct;
+    });
+
   res.render("shop/cart", {
     docTitle: "Cart",
     myActivePath: "/cart",
+    totalPrice,
+    products: cart.products,
   });
 };
 

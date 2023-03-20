@@ -76,6 +76,22 @@ class Cart {
       return err;
     }
   }
+
+  static async getCart() {
+    try {
+      const cartFileContent = await fs.readFile(cartDataFilePath);
+
+      const cart = JSON.parse(cartFileContent);
+
+      if (cart.products)
+        // Boolean([]) is true
+        return cart;
+
+      return null;
+    } catch (err) {
+      return err;
+    }
+  }
 }
 
 // for initial population
