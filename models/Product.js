@@ -39,6 +39,31 @@ class Product {
     }
   }
 
+  static async delete(prodId) {
+    try {
+      const fileContents = await fs.readFile(productDataFilePath, {
+        encoding: "utf-8",
+      });
+
+      const products = JSON.parse(fileContents.toString());
+
+      const productIndex = products.findIndex((item) => item.id == prodId);
+      if (productIndex !== -1) {
+        products.splice(productIndex, productIndex + 1);
+
+        await fs.writeFile(productDataFilePath, JSON.stringify(products), {
+          encoding: "utf-8",
+        });
+
+        return true;
+      }
+
+      return false; // indicate error
+    } catch (err) {
+      return err;
+    }
+  }
+
   static async fetchAll() {
     try {
       const fileContents = await fs.readFile(productDataFilePath);

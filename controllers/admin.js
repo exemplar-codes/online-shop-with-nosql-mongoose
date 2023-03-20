@@ -72,6 +72,18 @@ const postEditProduct = async (req, res, next) => {
   res.redirect("/");
 };
 
+const deleteProduct = async (req, res, next) => {
+  const prodId = req.params.productId;
+  const deleteSuccessful = await Product.delete(prodId);
+
+  if (deleteSuccessful) res.redirect("/");
+  else {
+    // 404 page
+    next();
+    return;
+  }
+};
+
 const deleteAllProducts = async (req, res, next) => {
   await Product.deleteAll(); //
 
@@ -85,4 +97,5 @@ module.exports = {
   deleteAllProducts,
   getEditProduct,
   postEditProduct,
+  deleteProduct,
 };
