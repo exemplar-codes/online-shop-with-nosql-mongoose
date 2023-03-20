@@ -16,13 +16,17 @@ const getAddProduct = (req, res, next) => {
   res.render("admin/add-or-edit-product", {
     myActivePath: "on-admin-page",
     docTitle: "Add product",
+    editing: false,
   });
 };
 
 const getEditProduct = (req, res, next) => {
-  res.render("admin/edit-product", {
+  const prodId = req.params.productId;
+
+  res.render("admin/add-or-edit-product", {
     myActivePath: "/admin/edit-product",
     docTitle: "Edit product",
+    editing: true,
   });
 };
 

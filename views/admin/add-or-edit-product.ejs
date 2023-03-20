@@ -20,7 +20,7 @@
             <textarea name="description" id="description" rows="5"></textarea>
         </div>
 
-        <button class="btn" type="submit">Add Product (admin)</button>
+        <button class="btn" type="submit"><%= editing ? "Edit Product (admin)" : "Add Product (admin)" %></button>
     </form>
 </main>
 <%- include('../includes/end.ejs') %>

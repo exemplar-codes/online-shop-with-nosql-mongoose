@@ -8,7 +8,7 @@ const adminController = require('../controllers/admin')
 router.get('/add-product', adminController.getAddProduct);
 
 // /admin/add-product => GET
-router.get('/edit-product', adminController.getEditProduct);
+router.get('/edit-product/:productId', adminController.getEditProduct);
 
 // admin/products => GET list of products added by admin
 router.get('/products', adminController.getAdminProducts);
