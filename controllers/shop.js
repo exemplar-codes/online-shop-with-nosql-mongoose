@@ -57,15 +57,22 @@ const checkoutPage = async (req, res, next) => {
 const postCart = async (req, res, next) => {
   const prodId = req.body.productId;
   const { price: productPrice } = await Product.findById(prodId);
-  await Cart.addProduct(prodId, productPrice);
-  // 1. This key is same as '<input name />' on the frontend.
-  // 2. We are using `urlencoded` middleware plugin to read form body. It's in `app` file right now.
 
-  // res.render("shop/checkout", {
-  //   docTitle: "Checkout",
-  //   myActivePath: "/checkout",
-  // });
-  res.redirect("/cart");
+  if (!req.query.delete) {
+    await Cart.addProduct(prodId, productPrice);
+    res.redirect("/cart");
+    return;
+  }
+
+  const productDeleteSuccessful = await Cart.deleteProduct(
+    prodId,
+    productPrice
+  );
+  if (!productDeleteSuccessful) {
+    res.status(402).redirect("/cart");
+  } else {
+    res.redirect("/cart");
+  }
 };
 
 const checkoutEditPage = async (req, res, next) => {

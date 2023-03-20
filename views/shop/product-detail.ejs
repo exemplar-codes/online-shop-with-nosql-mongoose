@@ -12,5 +12,9 @@
         <input type="hidden" name="productId"  value="<%= prod.id %>" />
         <button type="submit" class="btn">Add to Cart</button>
       </form>
+      <form action="/cart<%= "?delete=true" %>" method="POST" style="display: inline; margin: 0; padding: 0;">
+        <input type="hidden" name="productId"  value="<%= prod.id %>" />
+        <button type="submit" class="btn">Delete from Cart</button>
+      </form>
     </main>
 <%- include('../includes/end.ejs') %>

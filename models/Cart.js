@@ -7,7 +7,7 @@ const cartDataFilePath = path.join(rootDir, "data", "cart.json");
 
 class Cart {
   constructor() {
-    this.products = []; // type: Product
+    this.products = []; // type: {id: string, quantity: string (number)}
     this.totalPrice = 0;
   }
 
@@ -21,7 +21,9 @@ class Cart {
 
       const cart = JSON.parse(cartFileContent);
 
-      const productIndexInCart = cart.products.findIndex((item) => item.id == id);
+      const productIndexInCart = cart.products.findIndex(
+        (item) => item.id == id
+      );
 
       if (productIndexInCart !== -1) {
         cart.products[productIndexInCart].quantity += qty;
@@ -36,6 +38,40 @@ class Cart {
       await fs.writeFile(cartDataFilePath, JSON.stringify(cart), {
         encoding: "utf-8",
       });
+    } catch (err) {
+      return err;
+    }
+  }
+
+  static async deleteProduct(prodId, productPrice) {
+    try {
+      const cartFileContent = await fs.readFile(cartDataFilePath);
+
+      const cart = JSON.parse(cartFileContent);
+
+      const productIndexInCart = cart.products.findIndex(
+        (item) => item.id == prodId
+      );
+
+      if (productIndexInCart == -1) {
+        return false;
+      }
+
+      const qty = cart.products[productIndexInCart].quantity;
+
+      // remove the item
+      cart.products.splice(productIndexInCart, productIndexInCart + 1);
+
+      // update price
+      cart.totalPrice -= qty * productPrice;
+
+      console.log("Done");
+      // save to file
+      await fs.writeFile(cartDataFilePath, JSON.stringify(cart), {
+        encoding: "utf-8",
+      });
+
+      return true;
     } catch (err) {
       return err;
     }
