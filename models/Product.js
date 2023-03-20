@@ -22,7 +22,12 @@ class Product {
 
       const products = JSON.parse(fileContents.toString());
 
-      products.push(this); // `this` refers to the Product instance
+      const productIndex = products.findIndex((item) => item.id == this.id);
+      if (productIndex === -1) {
+        products.push(this); // `this` refers to the Product instance
+      } else {
+        products[productIndex] = this;
+      }
 
       await fs.writeFile(productDataFilePath, JSON.stringify(products), {
         encoding: "utf-8",

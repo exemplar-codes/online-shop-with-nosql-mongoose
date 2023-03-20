@@ -20,12 +20,20 @@ const getAddProduct = (req, res, next) => {
   });
 };
 
-const getEditProduct = (req, res, next) => {
+const getEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
+  const product = await Product.findById(prodId);
+
+  if (!product) {
+    // end middleware, hopefully 404 will run ahead
+    next();
+    return;
+  }
 
   res.render("admin/add-or-edit-product", {
     myActivePath: "/admin/edit-product",
     docTitle: "Edit product",
+    prod: product,
     editing: true,
   });
 };
@@ -42,9 +50,24 @@ const postAddProduct = async (req, res, next) => {
   res.redirect("/");
 };
 
-const putEditProduct = async (req, res, next) => {
-  const newProduct = new Product(req.body.title);
-  // await newProduct.save();
+const postEditProduct = async (req, res, next) => {
+  const prodId = req.params.productId;
+  const product = await Product.findById(prodId);
+
+  if (!product) {
+    // end middleware, hopefully 404 will run ahead
+    next();
+    return;
+  }
+
+  const newProduct = new Product(
+    req.body.title,
+    req.body.imageUrl,
+    req.body.description,
+    req.body.price
+  );
+  newProduct.id = prodId;
+  await newProduct.save();
 
   res.redirect("/");
 };
@@ -61,5 +84,5 @@ module.exports = {
   postAddProduct,
   deleteAllProducts,
   getEditProduct,
-  putEditProduct,
+  postEditProduct,
 };
