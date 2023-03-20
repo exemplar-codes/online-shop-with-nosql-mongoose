@@ -5,22 +5,51 @@
       <% if (products.length === 0) {%>
         <h2>No products here!</h2>
       <% } else { %>
+        <h2>
+          <%
+            const integer = Math.floor(totalPrice);
+            const fraction = Math.round((totalPrice - integer) * 100) / 100;
+            const displayPrice = integer + fraction;
+          %>
+          Total: $ <%= displayPrice %>
+        </h2>
         <table class="centered" border="1">
           <thead class="capitalize">
             <tr>
               <% for(keyName of Object.keys(products[0])) { %>
                 <th><%= keyName %></th>
               <% } %>
+              <th><em>Adjust quantity</em></th>
+              <th><em>Remove</em></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <% for(prod of products) { %>
+            <% for(prod of products) { %>
+              <tr>
                 <% for(value of Object.values(prod)) { %>
                   <td><%= value %></td>
                 <% } %>
-              <% } %>
-            </tr>
+                <td>
+                  <% if(prod.quantity > 1) { %>
+                    <form action="/cart?decrement=true" method="POST" style="display: inline; margin: 0; padding: 0;">
+                      <input type="hidden" name="productId"  value="<%= prod.id %>" />
+                      <button type="submit" class="btn">-</button>
+                    </form>
+                  <% } %>
+
+                  <form action="/cart" method="POST" style="display: inline; margin: 0; padding: 0;">
+                    <input type="hidden" name="productId"  value="<%= prod.id %>" />
+                    <button type="submit" class="btn">+</button>
+                  </form>
+                </td>
+                <td>
+                  <form action="/cart?delete=true" method="POST" style="display: inline; margin: 0; padding: 0;">
+                    <input type="hidden" name="productId"  value="<%= prod.id %>" />
+                    <button type="submit" class="btn">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% } %>
           </tbody>
         </table>
       <% } %>

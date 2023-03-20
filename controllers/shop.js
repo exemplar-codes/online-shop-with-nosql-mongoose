@@ -87,21 +87,30 @@ const postCart = async (req, res, next) => {
   const prodId = req.body.productId;
   const { price: productPrice } = await Product.findById(prodId);
 
-  if (!req.query.delete) {
-    await Cart.addProduct(prodId, productPrice);
+  if (req.query.decrement) {
+    await Cart.addProduct(prodId, productPrice, -1);
     res.redirect("/cart");
     return;
   }
 
-  const productDeleteSuccessful = await Cart.deleteProduct(
-    prodId,
-    productPrice
-  );
-  if (!productDeleteSuccessful) {
-    res.status(402).redirect("/cart");
-  } else {
-    res.redirect("/cart");
+  if (req.query.delete) {
+    const productDeleteSuccessful = await Cart.deleteProduct(
+      prodId,
+      productPrice
+    );
+    if (!productDeleteSuccessful) {
+      res.status(402).redirect("/cart");
+    } else {
+      res.redirect("/cart");
+    }
+
+    return;
   }
+
+  // default is add
+  await Cart.addProduct(prodId, productPrice);
+  res.redirect("/cart");
+  return;
 };
 
 const checkoutEditPage = async (req, res, next) => {
