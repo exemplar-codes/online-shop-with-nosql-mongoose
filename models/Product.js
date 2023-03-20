@@ -5,13 +5,13 @@ const rootDir = require("../util/path");
 const productDataFilePath = path.join(rootDir, "data", "products.json");
 
 class Product {
-  constructor(title, imageUrl, description = "No description", price = 19.99) {
+  constructor(title, imageUrl, description, price) {
     //  deliberately ignoring id, or update for this demo.
     this.id = Math.floor(Math.random() * 100);
     this.title = title;
-    this.imageUrl = imageUrl;
-    this.description = description;
-    this.price = price;
+    this.imageUrl = imageUrl || "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png";
+    this.description = description || "No description";
+    this.price = price || 19.99;
   }
 
   async save() {
