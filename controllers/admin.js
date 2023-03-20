@@ -13,7 +13,7 @@ const getAdminProducts = async (req, res, next) => {
 };
 
 const getAddProduct = (req, res, next) => {
-  res.render("admin/add-product", {
+  res.render("admin/add-or-edit-product", {
     myActivePath: "on-admin-page",
     docTitle: "Add product",
   });
