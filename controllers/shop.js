@@ -1,3 +1,7 @@
+const path = require("path");
+const rootDir = require("../util/path");
+const db = require(path.join(rootDir, "util", "database.js"));
+
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 
@@ -8,8 +12,10 @@ const indexPage = async (req, res, next) => {
   });
 };
 
+
 const getProducts = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  // const products = await Product.fetchAll();
+  const [products] = await db.execute("SELECT * FROM products");
 
   res.render("shop/product-list", {
     prods: products,

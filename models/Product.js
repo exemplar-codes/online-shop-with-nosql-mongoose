@@ -68,9 +68,12 @@ class Product {
 
   static async fetchAll() {
     try {
-      const fileContents = await fs.readFile(productDataFilePath);
+      // const fileContents = await fs.readFile(productDataFilePath);
 
-      return JSON.parse(fileContents.toString());
+      // return JSON.parse(fileContents.toString());
+
+      const [rows] = await db.execute("SELECT * FROM products");
+      return rows;
     } catch (err) {
       return err;
     }
