@@ -9,7 +9,9 @@ class Product {
     //  deliberately ignoring id, or update for this demo.
     this.id = Math.floor(Math.random() * 100);
     this.title = title;
-    this.imageUrl = imageUrl || "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png";
+    this.imageUrl =
+      imageUrl ||
+      "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png";
     this.description = description || "No description";
     this.price = price || 19.99;
   }
