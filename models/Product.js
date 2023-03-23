@@ -20,24 +20,25 @@ class Product {
 
   async save() {
     try {
-      const fileContents = await fs.readFile(productDataFilePath, {
-        encoding: "utf-8",
-      });
+      // const fileContents = await fs.readFile(productDataFilePath, {
+      //   encoding: "utf-8",
+      // });
+      // const products = JSON.parse(fileContents.toString());
+      // const productIndex = products.findIndex((item) => item.id == this.id);
+      // if (productIndex === -1) {
+      //   products.push(this); // `this` refers to the Product instance
+      // } else {
+      //   products[productIndex] = this;
+      // }
+      // await fs.writeFile(productDataFilePath, JSON.stringify(products), {
+      //   encoding: "utf-8",
+      // });
+      // return null;
 
-      const products = JSON.parse(fileContents.toString());
-
-      const productIndex = products.findIndex((item) => item.id == this.id);
-      if (productIndex === -1) {
-        products.push(this); // `this` refers to the Product instance
-      } else {
-        products[productIndex] = this;
-      }
-
-      await fs.writeFile(productDataFilePath, JSON.stringify(products), {
-        encoding: "utf-8",
-      });
-
-      return null;
+      await db.execute(
+        "INSERT INTO products (title, imageUrl, description, price) VALUES (?, ?, ?, ?)",
+        [this.price, this.imageUrl, this.description, this.price]
+      );
     } catch (err) {
       console.log(err);
       return err;
@@ -46,27 +47,27 @@ class Product {
 
   static async delete(prodId) {
     try {
-      const fileContents = await fs.readFile(productDataFilePath, {
-        encoding: "utf-8",
-      });
+      // const fileContents = await fs.readFile(productDataFilePath, {
+      //   encoding: "utf-8",
+      // });
 
-      const products = JSON.parse(fileContents.toString());
+      // const products = JSON.parse(fileContents.toString());
 
-      const productIndex = products.findIndex((item) => item.id == prodId);
-      if (productIndex !== -1) {
-        products.splice(productIndex, productIndex + 1);
+      // const productIndex = products.findIndex((item) => item.id == prodId);
+      // if (productIndex !== -1) {
+      //   products.splice(productIndex, productIndex + 1);
 
-        await fs.writeFile(productDataFilePath, JSON.stringify(products), {
-          encoding: "utf-8",
-        });
+      //   await fs.writeFile(productDataFilePath, JSON.stringify(products), {
+      //     encoding: "utf-8",
+      //   });
 
-        return true;
-      }
+      //   return true;
+      // }
 
-      return false; // indicate error
+      await db.execute("DELETE FROM products WHERE id=?", [prodId]);
     } catch (err) {
       console.log(err);
-      return err;
+      return false; // indicate error
     }
   }
 
