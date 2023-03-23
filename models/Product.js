@@ -92,7 +92,14 @@ class Product {
 
       // return products.find((item) => item.id == id) ?? null; // params are strings, funny bug
 
-      const [rows] = await db.execute(`SELECT * FROM products WHERE id=${id}`);
+      // dangerous - SQL injection possible
+      // const [rows] = await db.execute(`SELECT * FROM products WHERE ID=${id}`);
+
+      // Does the same thing as above. But better.
+      // ? is the placeholder where mysql2 will substitute sanitized equivalents of the elements (passed in the array)
+      const [rows] = await db.execute(`SELECT * FROM products WHERE ID=?`, [
+        id,
+      ]);
 
       console.log(rows);
       return rows[0] ?? null;
