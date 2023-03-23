@@ -4,6 +4,8 @@ const path = require("path");
 const rootDir = require("../util/path");
 const productDataFilePath = path.join(rootDir, "data", "products.json");
 
+const db = require(path.join(rootDir, "util", "database.js"));
+
 class Product {
   constructor(title, imageUrl, description, price) {
     //  deliberately ignoring id, or update for this demo.
@@ -84,11 +86,16 @@ class Product {
 
   static async findById(id) {
     try {
-      const fileContents = await fs.readFile(productDataFilePath);
+      // const fileContents = await fs.readFile(productDataFilePath);
 
-      const products = JSON.parse(fileContents.toString());
+      // const products = JSON.parse(fileContents.toString());
 
-      return products.find((item) => item.id == id) ?? null; // params are strings, funny bug
+      // return products.find((item) => item.id == id) ?? null; // params are strings, funny bug
+
+      const [rows] = await db.execute(`SELECT * FROM products WHERE id=${id}`);
+
+      console.log(rows);
+      return rows[0] ?? null;
     } catch (err) {
       console.log(err);
       return err;
