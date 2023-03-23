@@ -37,6 +37,7 @@ class Product {
 
       return null;
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
@@ -62,6 +63,7 @@ class Product {
 
       return false; // indicate error
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
@@ -75,6 +77,7 @@ class Product {
       const [rows] = await db.execute("SELECT * FROM products");
       return rows;
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
@@ -87,6 +90,7 @@ class Product {
 
       return products.find((item) => item.id == id) ?? null; // params are strings, funny bug
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
@@ -100,6 +104,7 @@ class Product {
 
       return null;
     } catch (err) {
+      console.log(err);
       return err;
     }
   }

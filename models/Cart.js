@@ -39,6 +39,7 @@ class Cart {
         encoding: "utf-8",
       });
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
@@ -72,6 +73,7 @@ class Cart {
 
       return true;
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
@@ -88,6 +90,7 @@ class Cart {
 
       return null;
     } catch (err) {
+      console.log(err);
       return err;
     }
   }
