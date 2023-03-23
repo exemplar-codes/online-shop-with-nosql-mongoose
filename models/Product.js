@@ -36,8 +36,8 @@ class Product {
       // return null;
 
       await db.execute(
-        "INSERT INTO products (title, imageUrl, description, price) VALUES (?, ?, ?, ?)",
-        [this.price, this.imageUrl, this.description, this.price]
+        "INSERT INTO products (title, imageUrl, description, price) VALUES (?, ?, ?, ?);",
+        [this.title, this.imageUrl, this.description, this.price.toString()]
       );
     } catch (err) {
       console.log(err);
@@ -127,19 +127,42 @@ class Product {
 
 // for initial population
 // this runs only once, since file import are cached in Node.js
+
+const initialProducts = [
+  {
+    id: 1,
+    title: "A book",
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+    description: "This is an awesome book",
+    price: 12.99,
+  },
+  {
+    id: 2,
+    title: "A laptop",
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/b/bb/Alienware_M14x_%282%29.jpg",
+    description: "A performant, quiet laptop",
+    price: 1000,
+  },
+];
+
 (async () => {
-  const firstProduct = new Product("An awesome book");
-  const potentialError = await firstProduct.save();
-  if (true || potentialError?.code !== "ENOENT") {
-    try {
-      await fs.mkdir(path.dirname(productDataFilePath), { recursive: true });
-      await fs.writeFile(productDataFilePath, JSON.stringify([]), {
-        encoding: "utf-8",
-      });
-      await firstProduct.save();
-    } catch (err) {
-      console.log(err);
-    }
+  try {
+    const productsInDB = await Product.fetchAll();
+
+    if (productsInDB.length > 0) return;
+
+    console.log("DB is empty");
+    initialProducts.forEach(
+      async ({ id, title, imageUrl, description, price }) => {
+        const newProduct = new Product(title, imageUrl, description, price);
+        await newProduct.save();
+      }
+    );
+    console.log("DB populated with mock data");
+  } catch (err) {
+    console.log(err);
   }
 })();
 
