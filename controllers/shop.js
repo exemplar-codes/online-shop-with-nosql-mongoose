@@ -25,7 +25,7 @@ const getProducts = async (req, res, next) => {
 };
 
 const getProduct = async (req, res, next) => {
-  const product = await Product.findById(req.params.productId, 10);
+  const product = await Product.findById(req.params.productId);
 
   if (!product) {
     next(); // for not found route
