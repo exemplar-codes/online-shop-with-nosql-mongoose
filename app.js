@@ -1,5 +1,7 @@
 const path = require('path');
 
+const sequelize = require("./util/database");
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -22,4 +24,10 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-app.listen(process.env.PORT || 3000);
+sequelize
+  .sync()
+  .then(() => {
+    app.listen(process.env.PORT || 3000);
+  })
+  .catch(console.log);
+
