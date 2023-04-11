@@ -10,7 +10,7 @@ const indexPage = async (req, res, next) => {
 
 
 const getProducts = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const products = await Product.findAll();
 
   res.render("shop/product-list", {
     prods: products,
@@ -20,7 +20,9 @@ const getProducts = async (req, res, next) => {
 };
 
 const getProduct = async (req, res, next) => {
-  const product = await Product.findById(req.params.productId);
+  const product = await Product.findById(req.params.productId, {
+    attributes: ["tite"],
+  });
 
   if (!product) {
     next(); // for not found route
