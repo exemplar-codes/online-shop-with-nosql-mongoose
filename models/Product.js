@@ -36,9 +36,7 @@ const Product = sequelize.define(
   },
   {
     hooks: {
-      async afterSync(...x) {
-        await populateProducts();
-      },
+      afterSync: populateProducts,
     },
   }
 );
@@ -71,6 +69,7 @@ async function populateProducts() {
       const newProduct = new Product(iprod);
       newProduct.save();
     });
+    console.log("Sample products populated!");
   } catch (error) {
     console.log(error);
     return;

@@ -15,6 +15,19 @@ const User = sequelize.define("user", {
 
   name: Sequelize.STRING,
   email: Sequelize.STRING,
+}, {
+  hooks: {
+    afterSync: populateFirstUser,
+  }
 });
 
+async function populateFirstUser() {
+  const users = await User.findAll({ limit: 1 });
+  if (users.length)
+    return;
+
+  const firstUser = User.build({ name: 'SanjarOne', email: 'SanjarOne@gmail.com' });
+  await firstUser.save();
+  console.log('Sample user populated!')
+}
 module.exports = User;
