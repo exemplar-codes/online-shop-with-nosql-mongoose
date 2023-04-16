@@ -10,6 +10,8 @@ const app = express();
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const errorController = require('./controllers/error');
+const Product = require('./models/Product');
+const User = require('./models/User');
 
 // app.set('view engine', 'pug');
 // app.set('views', 'views'); // not needed for this case, actually
@@ -23,6 +25,9 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
+
+User.hasMany(Product);
+Product.belongsTo(User);
 
 sequelize
   .sync()
