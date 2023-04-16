@@ -21,13 +21,24 @@ const User = sequelize.define("user", {
   }
 });
 
-async function populateFirstUser() {
-  const users = await User.findAll({ limit: 1 });
-  if (users.length)
-    return;
+const initialUsers = [{ name: "SanjarOne", email: "SanjarOne@gmail.com" }];
 
-  const firstUser = User.build({ name: 'SanjarOne', email: 'SanjarOne@gmail.com' });
-  await firstUser.save();
-  console.log('Sample user populated!')
+async function populateFirstUser() {
+  try {
+    const products = await User.findAll();
+
+    if (products.length > 0) return;
+
+    initialUsers.forEach(async (iuser) => {
+      delete iuser.id;
+      const newUser = User.build(iuser);
+      newUser.save();
+    });
+    console.log("Sample user populated!");
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 }
+
 module.exports = User;
