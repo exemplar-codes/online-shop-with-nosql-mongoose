@@ -6,7 +6,7 @@ const sequelize = require(path.join(rootDir, "util", "database.js"));
 
 // instance of sequelize, not the class
 const Product = sequelize.define(
-"product",
+  "product",
   {
     // model name is typically in lowercase
 
@@ -35,7 +35,6 @@ const Product = sequelize.define(
     },
   },
   {
-    tableName: "table-custom-name",
     hooks: {
       async afterSync(...x) {
         await populateProducts();
