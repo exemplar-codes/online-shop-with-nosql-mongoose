@@ -27,7 +27,8 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 User.hasMany(Product);
-Product.belongsTo(User);
+Product.belongsTo(User, { onDelete: 'CASCADE' }); // syntax: talks about onDelete of target.
+// What it does here? Delete all products related to a user when the user is deleted
 
 sequelize
   .sync()
