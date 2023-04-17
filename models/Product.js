@@ -77,4 +77,5 @@ async function populateProducts() {
 }
 
 module.exports = Product;
+module.exports.initialProducts = initialProducts;
 module.exports.populateProducts = populateProducts;

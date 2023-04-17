@@ -17,17 +17,17 @@ const User = sequelize.define("user", {
   email: Sequelize.STRING,
 }, {
   hooks: {
-    afterSync: populateFirstUser,
+    afterSync: populateUsers,
   }
 });
 
 const initialUsers = [{ name: "SanjarOne", email: "SanjarOne@gmail.com" }];
 
-async function populateFirstUser() {
+async function populateUsers() {
   try {
-    const products = await User.findAll();
+    const users = await User.findAll({ limit: 1});
 
-    if (products.length > 0) return;
+    if (users.length > 0) return;
 
     initialUsers.forEach(async (iuser) => {
       delete iuser.id;
@@ -42,3 +42,5 @@ async function populateFirstUser() {
 }
 
 module.exports = User;
+module.exports.initialUsers = initialUsers;
+module.exports.populateUsers = populateUsers;
