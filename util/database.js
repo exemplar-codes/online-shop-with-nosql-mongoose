@@ -18,7 +18,6 @@ async function populateDatabaseWithSampleData(x) {
   const User = require("../models/User");
   const Product = require("../models/Product");
 
-  const u = Sequelize.Utils;
   const users = await User.findAll({ limit: 1 });
 
   if (users.length > 0) return;
