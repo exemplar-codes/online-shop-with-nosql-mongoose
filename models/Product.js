@@ -36,7 +36,7 @@ const Product = sequelize.define(
   },
   {
     hooks: {
-      afterSync: populateProducts,
+      // afterSync: populateProducts,
     },
   }
 );

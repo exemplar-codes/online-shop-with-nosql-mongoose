@@ -17,7 +17,7 @@ const User = sequelize.define("user", {
   email: Sequelize.STRING,
 }, {
   hooks: {
-    afterSync: populateUsers,
+    // afterSync: populateUsers,
   }
 });
 
