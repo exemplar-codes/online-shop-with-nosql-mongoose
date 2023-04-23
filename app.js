@@ -21,6 +21,12 @@ app.set("views", "views"); // not needed for this case, actually
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// mock authentication, i.e. get user who's making the request
+app.use(async (req, res, next) => {
+  req.user = await User.findByPk(1);
+  next();
+});
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
