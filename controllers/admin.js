@@ -39,13 +39,13 @@ const getEditProduct = async (req, res, next) => {
 };
 
 const postAddProduct = async (req, res, next) => {
-  const newProduct = new Product(
-    req.body.title,
-    req.body.imageUrl,
-    req.body.description,
-    req.body.price
-  );
-  await newProduct.save();
+  const user = req.user;
+  await user.createProduct({
+    title: req.body.title,
+    imageUrl: req.body.imageUrl,
+    description: req.body.description,
+    price: req.body.price,
+  });
 
   res.redirect("/");
 };
