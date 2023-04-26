@@ -20,9 +20,7 @@ const getProducts = async (req, res, next) => {
 };
 
 const getProduct = async (req, res, next) => {
-  const product = await Product.findById(req.params.productId, {
-    attributes: ["tite"],
-  });
+  const product = await Product.findByPk(req.params.productId);
 
   if (!product) {
     next(); // for not found route
@@ -31,7 +29,7 @@ const getProduct = async (req, res, next) => {
 
   res.render("shop/product-detail", {
     prod: product,
-    docTitle: `${req.params.productId} - ${product.title}`,
+    docTitle: `${product.id} - ${product.title}`,
     myActivePath: "/products",
   });
 };
