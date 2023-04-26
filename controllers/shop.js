@@ -36,7 +36,7 @@ const getProduct = async (req, res, next) => {
 
 const cartPage = async (req, res, next) => {
   const cart = await Cart.getCart();
-  const allProducts = await Product.fetchAll();
+  const allProducts = await Product.findAll();
 
   let totalPrice = 0;
   // filter out products in cart that are present in allProducts

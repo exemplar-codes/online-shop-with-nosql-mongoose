@@ -1,7 +1,7 @@
 const Product = require("../models/Product");
 
 const getAdminProducts = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const products = await Product.findAll();
   const productsByAdmin = products.filter(() => true);
   // add owned by a particular admin filter, later
 
