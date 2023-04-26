@@ -61,13 +61,12 @@ const postEditProduct = async (req, res, next) => {
     return;
   }
 
-  product.update({
+  await product.update({
     title: req.body.title,
     imageUrl: req.body.imageUrl,
     description: req.body.description,
     price: req.body.price,
   });
-  await product.save();
 
   res.redirect("/");
 };

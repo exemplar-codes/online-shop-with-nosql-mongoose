@@ -67,7 +67,7 @@ async function populateProducts() {
     initialProducts.forEach(async (iprod) => {
       delete iprod.id;
       const newProduct = Product.build(iprod);
-      newProduct.save();
+      await newProduct.save();
     });
     console.log("Sample products populated!");
   } catch (error) {

@@ -36,7 +36,7 @@ async function populateUsers() {
     initialUsers.forEach(async (iuser) => {
       delete iuser.id;
       const newUser = User.build(iuser);
-      newUser.save();
+      await newUser.save();
     });
     console.log("Sample user populated!");
   } catch (error) {
