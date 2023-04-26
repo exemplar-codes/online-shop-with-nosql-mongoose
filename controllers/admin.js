@@ -22,7 +22,7 @@ const getAddProduct = (req, res, next) => {
 
 const getEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const product = await Product.findById(prodId);
+  const product = await Product.findByPk(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -52,7 +52,7 @@ const postAddProduct = async (req, res, next) => {
 
 const postEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const product = await Product.findById(prodId);
+  const product = await Product.findByPk(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead

@@ -86,7 +86,7 @@ const checkoutPage = async (req, res, next) => {
 
 const postCart = async (req, res, next) => {
   const prodId = req.body.productId;
-  const { price: productPrice } = await Product.findById(prodId);
+  const { price: productPrice } = await Product.findByPk(prodId);
 
   if (req.query.decrement) {
     await Cart.addProduct(prodId, productPrice, -1);
