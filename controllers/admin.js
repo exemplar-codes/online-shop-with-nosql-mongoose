@@ -1,12 +1,11 @@
 const Product = require("../models/Product");
 
 const getAdminProducts = async (req, res, next) => {
-  const products = await Product.findAll();
-  const productsByAdmin = products.filter(() => true);
-  // add owned by a particular admin filter, later
+  const admin = req.user;
+  const products = await admin.getProducts();
 
   res.render("admin/products", {
-    prods: productsByAdmin,
+    prods: products,
     docTitle: "Admin products",
     myActivePath: "/admin/products",
   });
@@ -22,7 +21,8 @@ const getAddProduct = (req, res, next) => {
 
 const getEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const product = await Product.findByPk(prodId);
+  const admin = req.user;
+  const [product = null] = await admin.getProducts({ where: { id: prodId } });
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -52,7 +52,8 @@ const postAddProduct = async (req, res, next) => {
 
 const postEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const product = await Product.findByPk(prodId);
+  const admin = req.user;
+  const [product = null] = await admin.getProducts({ where: { id: prodId } });
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -60,21 +61,22 @@ const postEditProduct = async (req, res, next) => {
     return;
   }
 
-  const newProduct = new Product(
-    req.body.title,
-    req.body.imageUrl,
-    req.body.description,
-    req.body.price
-  );
-  newProduct.id = prodId;
-  await newProduct.save();
+  product.update({
+    title: req.body.title,
+    imageUrl: req.body.imageUrl,
+    description: req.body.description,
+    price: req.body.price,
+  });
+  await product.save();
 
   res.redirect("/");
 };
 
 const deleteProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const deleteSuccessful = await Product.delete(prodId);
+  const admin = req.user;
+  const deleteSuccessful = await admin.removeProduct(prodId);
+  // FIXME: how know if operation succeeeded or not in Sequelize
 
   if (deleteSuccessful) res.redirect("/");
   else {
@@ -85,7 +87,8 @@ const deleteProduct = async (req, res, next) => {
 };
 
 const deleteAllProducts = async (req, res, next) => {
-  await Product.deleteAll(); //
+  const admin = req.user;
+  await admin.setProducts([]);
 
   res.redirect("/");
 };
