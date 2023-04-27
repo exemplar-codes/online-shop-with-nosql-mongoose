@@ -1,16 +1,41 @@
 const env = require("dotenv").config().parsed;
+/**
+ * ENV keys: DBNAME, MYSQL_DATABASE_PASSWORD
+ */
 const database_password = env["MYSQL_DATABASE_PASSWORD"];
+const database_name = env["DBNAME"];
 
 const Sequelize = require("sequelize");
 
-// (database, username, password, options)
-const sequelize = new Sequelize("node-complete", "root", database_password, {
+// work even if DB does not exist
+const sequelize = new Sequelize({
+  username: "root",
+  password: database_password,
   host: "localhost",
   dialect: "mysql",
+
   hooks: {
+    afterConnect: async (connection, options) => {
+      // connection is a mysql2 connection, since Sequelize used mysq2 under the hood/
+      // also, Sequelize assumes a DB is present. We are bypassing this by using the mysql2 part Sequelize exposes, since
+      // mysql2 has no "DB should exist" requirement. All it needs are creds and the DB to be running
+      await connection
+        .promise()
+        .query("CREATE DATABASE IF NOT EXISTS " + database_name);
+      options.database = database_name;
+    },
     afterBulkSync: populateDatabaseWithSampleData,
   },
 });
+
+// // (database, username, password, options)
+// const sequelize = new Sequelize("node-complete", "root", database_password, {
+//   host: "localhost",
+//   dialect: "mysql",
+//   hooks: {
+//     afterBulkSync: populateDatabaseWithSampleData,
+//   },
+// });
 
 module.exports = sequelize;
 
