@@ -1,118 +1,38 @@
-const fs = require("fs/promises");
+const Sequelize = require("sequelize");
+
 const path = require("path");
-
 const rootDir = require("../util/path");
-const Product = require("./Product");
-const cartDataFilePath = path.join(rootDir, "data", "cart.json");
+const sequelize = require(path.join(rootDir, "util", "database.js"));
 
-class Cart {
-  constructor() {
-    this.products = []; // type: {id: string, quantity: string (number)}
-    this.totalPrice = 0;
-  }
+const Cart = sequelize.define("cart", {
+  id: {
+    primaryKey: true,
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    autoIncrement: true,
+    unique: true,
+  },
+  // A cart has many items, and an associated quantity.
+  // since cart items are an array, and we cannot store an array in the cart table, let's create a model called cartitem
+});
 
-  static async addProduct(id, productPrice, qty = 1) {
-    // Fetch the previous cart
-    // Analyze the products in it
-    // Add/increase the quantity
-
-    try {
-      const cartFileContent = await fs.readFile(cartDataFilePath);
-
-      const cart = JSON.parse(cartFileContent);
-
-      const productIndexInCart = cart.products.findIndex(
-        (item) => item.id == id
-      );
-
-      if (productIndexInCart !== -1) {
-        cart.products[productIndexInCart].quantity += qty;
-      } else {
-        cart.products.push({ id, quantity: qty });
-      }
-
-      // update price
-      cart.totalPrice += qty * productPrice;
-
-      // save to file
-      await fs.writeFile(cartDataFilePath, JSON.stringify(cart), {
-        encoding: "utf-8",
-      });
-    } catch (err) {
-      console.log(err);
-      return err;
-    }
-  }
-
-  static async deleteProduct(prodId, productPrice) {
-    try {
-      const cartFileContent = await fs.readFile(cartDataFilePath);
-
-      const cart = JSON.parse(cartFileContent);
-
-      const productIndexInCart = cart.products.findIndex(
-        (item) => item.id == prodId
-      );
-
-      if (productIndexInCart == -1) {
-        return false;
-      }
-
-      const qty = cart.products[productIndexInCart].quantity;
-
-      // remove the item
-      cart.products.splice(productIndexInCart, productIndexInCart + 1);
-
-      // update price
-      cart.totalPrice -= qty * productPrice;
-
-      // save to file
-      await fs.writeFile(cartDataFilePath, JSON.stringify(cart), {
-        encoding: "utf-8",
-      });
-
-      return true;
-    } catch (err) {
-      console.log(err);
-      return err;
-    }
-  }
-
-  static async getCart() {
-    try {
-      const cartFileContent = await fs.readFile(cartDataFilePath);
-
-      const cart = JSON.parse(cartFileContent);
-
-      if (cart.products)
-        // Boolean([]) is true
-        return cart;
-
-      return null;
-    } catch (err) {
-      console.log(err);
-      return err;
-    }
-  }
-}
-
-// for initial population
-// this runs only once, since file import are cached in Node.js
-(async () => {
-  if (true || potentialError?.code !== "ENOENT") {
-    try {
-      await fs.mkdir(path.dirname(cartDataFilePath), { recursive: true });
-      await fs.writeFile(
-        cartDataFilePath,
-        JSON.stringify({ products: [], totalPrice: 0 }),
-        {
-          encoding: "utf-8",
-        }
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  }
-})();
+// // for initial population
+// // this runs only once, since file import are cached in Node.js
+// (async () => {
+//   if (true || potentialError?.code !== "ENOENT") {
+//     try {
+//       await fs.mkdir(path.dirname(cartDataFilePath), { recursive: true });
+//       await fs.writeFile(
+//         cartDataFilePath,
+//         JSON.stringify({ products: [], totalPrice: 0 }),
+//         {
+//           encoding: "utf-8",
+//         }
+//       );
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   }
+// })();
 
 module.exports = Cart;
