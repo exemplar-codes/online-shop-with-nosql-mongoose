@@ -49,10 +49,6 @@ Product.belongsTo(User, { onDelete: "CASCADE" }); // syntax: talks about onDelet
 User.hasOne(Cart);
 Cart.belongsTo(User);
 
-// cart and cartItem, 1-N
-Cart.hasMany(CartItem);
-CartItem.belongsTo(Cart);
-
 // extra stuff, for ease of 'joined' pages
 // 1-
 // CartItem.hasOne(Product);
@@ -67,6 +63,11 @@ CartItem.belongsTo(Cart);
 // Cart.hasMany(Product, { through: CartItem }); // correct, but Sequelize has weird notation, it forces `belongsToMany` on both sides.
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+
+// For the magic methods, since they are absent.
+// Note: redundant from an SQL POV, since all FKs, indexes were added above.
+Cart.hasMany(CartItem);
+CartItem.belongsTo(Cart);
 
 sequelize
   .sync()
