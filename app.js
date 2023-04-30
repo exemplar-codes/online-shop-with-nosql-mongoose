@@ -31,6 +31,11 @@ app.use(async (req, res, next) => {
   next();
 });
 
+app.get("/try", async (req, res, next) => {
+  await new Promise((r) => setTimeout(r, 1000));
+  return res.json({ time: new Date().toLocaleTimeString() });
+});
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
