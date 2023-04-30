@@ -4,6 +4,7 @@ const sequelize = require("./util/database");
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
 
@@ -23,7 +24,7 @@ app.set("views", "views"); // not needed for this case, actually
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-
+app.use(cors());
 // mock authentication, i.e. get user who's making the request
 app.use(async (req, res, next) => {
   req.user = await User.findByPk(1);
