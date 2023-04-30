@@ -14,8 +14,7 @@ const errorController = require("./controllers/error");
 const Product = require("./models/Product");
 const User = require("./models/User");
 const Cart = require("./models/Cart");
-// const Cart = require("./models/Cart");
-// const CartItem = require("./models/CartItem");
+const CartItem = require("./models/CartItem");
 
 // app.set('view engine', 'pug');
 // app.set('views', 'views'); // not needed for this case, actually
@@ -46,23 +45,28 @@ User.hasMany(Product);
 Product.belongsTo(User, { onDelete: "CASCADE" }); // syntax: talks about onDelete of target.
 // What it does here? Delete all products related to a user when the user is deleted
 
-// // adding cart model, 1-1
-// User.hasOne(Cart);
-// Cart.belongsTo(User);
+// adding cart model, 1-1
+User.hasOne(Cart);
+Cart.belongsTo(User);
 
-// // cart and cartItem, 1-N
-// Cart.hasMany(CartItem);
-// CartItem.belongsTo(Cart);
+// cart and cartItem, 1-N
+Cart.hasMany(CartItem);
+CartItem.belongsTo(Cart);
 
-// // extra stuff, for ease of 'joined' pages
-// // 1-
+// extra stuff, for ease of 'joined' pages
+// 1-
 // CartItem.hasOne(Product);
-// // Product.belongsTo(CartItem); // no, doesn't make sense, OMIT
+// Product.belongsTo(CartItem); // no, doesn't make sense, OMIT
+/*
+  Also, Sequelize does not raise an error if model associations are inconsistent/nonsense.
+- It just creates all the tables, with links missing.
+- no errors, but 'afterBulkSync' does not run, which implies that Sequelize is aware of the unsuccessful "sync". So, why no errors reported? strange.
+ */
 
-// // N-M
-// // Cart.hasMany(Product, { through: CartItem }); // correct, but Sequelize has weird notation, it forces `belongsToMany` on both sides.
-// Cart.belongsToMany(Product, { through: CartItem });
-// Product.belongsToMany(Cart, { through: CartItem });
+// N-M
+// Cart.hasMany(Product, { through: CartItem }); // correct, but Sequelize has weird notation, it forces `belongsToMany` on both sides.
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
 
 sequelize
   .sync()
