@@ -1,3 +1,4 @@
+```
 // table, yes
 User =  {
     products: [<Product>],
@@ -18,6 +19,7 @@ Cart = {
 // no other choice but
 CartItem:
 cartId (imp), productId (~imp), quantity (ok)
+```
 
 Words
 - User has a Cart
@@ -31,14 +33,59 @@ Cart contains many products (with associated quantity) - weird, go below the lev
 - A cartitem is associated with one product. A product may be associated with many cart items (since quantity may differ).
 All done w.r.t cart, product and cartItem (the incidental model).
 Let's revise all possible assoications
-Cart, caritem - done
-Cart, product - cannot be done directly, so this whole process, ignore.
-Product, cartItem - ?
+- Cart, caritem - done
+- Cart, product - cannot be done directly, so this whole process, ignore.
+- Product, cartItem - product belongsToMany cartItem, seems weird --> go down a level of abstraction.
+    - Table wise, CartItemTable.root + add productId FK seems fine.
+    - So CartItem.belongsTo(Product) and Product.hasMany(CartItems)
+    - Doing both ways since I may wish to find all cartitems a product is present, too, for analytics/recommendations.
 
 CartItem *<----> Product
-CartItemTable.root + add productId, so CartItem.belongsTo(Product) and Product.hasMany(CartItems)
+CartItem  <----> Cart
 
+The code works (tables with desired FKs are generated):
+```js
+User.hasMany(Product);
+Product.belongsTo(User, { onDelete: "CASCADE" }); // ignore the onDelete, it's contextual to the project
 
+User.hasOne(Cart);
+Cart.belongsTo(User);
+
+Cart.hasMany(CartItem);
+CartItem.belongsTo(Cart);
+
+// using both sides (as is usual) since I wish to have analytics about Product and User who may buy them
+Product.hasMany(CartItem);
+CartItem.belongsTo(Product);
+```
+
+But, it may be better to avoid having associations with the incidental (junction) table, and use it via `through`. copying some stuff from above and rewriting.
+
+This:
+```js
+CartItem *<----> Product
+CartItem  <----> Cart
+
+// is? equivalent to
+(CartItem/Cart) *<----> Product
+
+// could be rewritten to avoid direct association with the junction (CartItem) model
+Cart* <---> Product 'through' CartItem
+
+// through is the 'junction' table construct in Sequelize
+```
+
+Placing FKs by the rule, we get:
+```js
+Cart.belongsTo(Product, { through: CartItem }); // a little weird
+Product.hasMany(Cart, { through: CartItem });    // very weird
+```
+
+Feels weird, yes, but it was like so on first observation too. Lesson: it's relatively eaiser to write ORM assoications, but reading can be very hard.
+
+---
+
+The following are rules I derived from the "thinking" above.
 Notes:
 1. First write down in words, simply use 'associated' and specify type of relation (1-1, 1-N, N-M). If there's extra data needed in addition to the association, note this down (we'll need a junction model here).
 2. For the ones where association is simple (no data needed), use the Sequelize defaults.
