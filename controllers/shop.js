@@ -48,15 +48,22 @@ const cartPage = async (req, res, next) => {
   });
 
   products = products.map((prod) => {
-    return extractKeys(prod, [
-      "id",
-      "title",
-      "price",
-      "imageUrl",
-      "description",
-      "contentItem",
-      "cartItem.quantity",
-    ]);
+    return extractKeys(
+      prod,
+      [
+        "id",
+        "title",
+        "price",
+        "imageUrl",
+        "description",
+        "contentItem",
+        "cartItem.quantity",
+      ],
+      {
+        shortKeys: true,
+        removeAssociatedColumns: false,
+      }
+    );
   });
 
   const totalPrice = products.reduce((accum, prod) => accum + +prod.price, 0);
