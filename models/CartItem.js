@@ -4,7 +4,7 @@ const path = require("path");
 const rootDir = require("../util/path");
 const sequelize = require(path.join(rootDir, "util", "database.js"));
 
-const CartItem = sequelize.define("cart-item", {
+const CartItem = sequelize.define("cartItem", {
   id: {
     primaryKey: true,
     type: Sequelize.INTEGER,

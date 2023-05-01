@@ -69,6 +69,10 @@ Product.belongsToMany(Cart, { through: CartItem });
 Cart.hasMany(CartItem);
 CartItem.belongsTo(Cart);
 
+// adding to avoid wasting time on query method quirks
+Product.hasMany(CartItem);
+CartItem.belongsTo(Product);
+
 sequelize
   .sync()
   .then(() => {

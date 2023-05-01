@@ -87,7 +87,8 @@ async function populateDatabaseWithSampleData(x) {
   // 3. Create a cart for the User
   const cart = await user.createCart(); // cart doesn't have own data columns, so fine.
   // const [product] = await Product.findAll({ limit: 1 });
-  // await cart.addProduct(product);
+  // const cartItem = await cart.createCartItem({ quantity: 1 });
+  // await cartItem.setProduct(product);
 }
 
 // No need to write the following. Sequelize does this for us

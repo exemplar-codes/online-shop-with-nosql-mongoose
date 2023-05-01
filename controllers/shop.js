@@ -1,4 +1,5 @@
 const Cart = require("../models/Cart");
+const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
 
 const indexPage = async (req, res, next) => {
@@ -7,7 +8,6 @@ const indexPage = async (req, res, next) => {
     myActivePath: "shop-page",
   });
 };
-
 
 const getProducts = async (req, res, next) => {
   const products = await Product.findAll();
@@ -35,38 +35,43 @@ const getProduct = async (req, res, next) => {
 };
 
 const cartPage = async (req, res, next) => {
-  const cart = await Cart.getCart();
-  const allProducts = await Product.findAll();
+  const user = req.user;
+  const cart = await user.getCart(); // have to 'get' it since it's an association, not owned column
+  let products = await cart.getProducts({
+    attributes: ["id", "title", "price", "imageUrl", "description"],
+    includes: {
+      model: [CartItem],
+      attributes: ["quantity"],
+    },
+    raw: true,
+  });
 
-  let totalPrice = 0;
-  // filter out products in cart that are present in allProducts
-  cart.products = cart.products
-    .map((cartProduct) => {
-      let existingProduct =
-        allProducts.find((item) => item.id == cartProduct.id) ?? null;
+  products = products.map((prod) => {
+    const desiredKeys = [
+      "id",
+      "title",
+      "price",
+      "imageUrl",
+      "description",
+      "contentItem",
+      "cartItem.quantity",
+    ];
+    return Object.entries(prod).reduce(
+      (accum, [k, v]) =>
+        desiredKeys.includes(k)
+          ? { ...accum, [k.split(".").at(-1)]: [v] }
+          : accum,
+      {}
+    );
+  });
 
-      if (existingProduct) {
-        existingProduct = {
-          ...existingProduct,
-          quantity: cartProduct.quantity,
-        };
-      }
-
-      return existingProduct;
-    })
-    .filter((cartProduct) => {
-      if (cartProduct) {
-        totalPrice += cartProduct.price * cartProduct.quantity;
-      }
-
-      return cartProduct;
-    });
+  const totalPrice = products.reduce((accum, prod) => accum + +prod.price, 0);
 
   res.render("shop/cart", {
     docTitle: "Cart",
     myActivePath: "/cart",
     totalPrice,
-    products: cart.products,
+    products: products,
   });
 };
 
