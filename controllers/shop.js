@@ -1,7 +1,7 @@
 const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
-const { extractKeys } = require("../util/common");
+const { extractKeys, dateToTimeStampString } = require("../util/common");
 
 const indexPage = async (req, res, next) => {
   res.render("shop/index", {
@@ -77,9 +77,27 @@ const cartPage = async (req, res, next) => {
 };
 
 const ordersPage = async (req, res, next) => {
+  const user = req.user;
+  let orders = await user.getOrders({ raw: true });
+
+  orders = orders.map((order) => {
+    const beautifiedOrder = extractKeys(
+      order,
+      ["id", "totalAmount", "shippingAddress", "createdAt"],
+      {
+        removeAssociatedColumns: true,
+      }
+    );
+    beautifiedOrder.createdAt = dateToTimeStampString(
+      beautifiedOrder.createdAt
+    );
+    return beautifiedOrder;
+  });
+
   res.render("shop/orders", {
     docTitle: "Orders",
     myActivePath: "/orders",
+    orders,
   });
 };
 

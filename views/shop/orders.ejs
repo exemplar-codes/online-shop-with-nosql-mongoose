@@ -1,4 +1,32 @@
 <%- include('../includes/head.ejs') %>
 <%- include('../includes/navigation.ejs') %>
     <h1 class="centered">Orders</h1>
+    <main >
+      <% if (orders.length === 0) {%>
+        <h2>No products here!</h2>
+      <% } else { %>
+        <table class="centered" border="1">
+          <thead class="capitalize">
+            <tr>
+              <% for(keyName of Object.keys(orders[0])) { %>
+                <th><%= keyName %></th>
+              <% } %>
+              <th><em>Action</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(order of orders) { %>
+              <tr>
+                <% for(value of Object.values(order)) { %>
+                  <td><%- value ?? "<code>blank</code>" %></td>
+                <% } %>
+                <td>
+                  <a href="/orders/<%= order.id %>">Details</a>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      <% } %>
+    </main>
 <%- include('../includes/end.ejs') %>
