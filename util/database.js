@@ -81,7 +81,7 @@ async function populateDatabaseWithSampleData(x) {
       ...User.initialUsers[0],
       [Sequelize.Utils.pluralize(Product.name)]: initialProducts, // array of model instances would be OK too
     },
-    { include: [{ model: Product, as: "seller" }] }
+    { include: [{ model: Product }] }
   );
 }
 

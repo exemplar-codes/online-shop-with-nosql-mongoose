@@ -41,13 +41,13 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 // for the admin user, 1-N
-User.hasMany(Product, { as: "seller" });
-Product.belongsTo(User, { onDelete: "CASCADE", as: "seller" }); // syntax: talks about onDelete of target.
+User.hasMany(Product);
+Product.belongsTo(User, { onDelete: "CASCADE" }); // syntax: talks about onDelete of target.
 // What it does here? Delete all products related to a user when the user is deleted
 
 // adding cart model, 1-1
-User.hasOne(Cart, { as: "buyer" });
-Cart.belongsTo(User, { as: "buyer" });
+User.hasOne(Cart);
+Cart.belongsTo(User);
 
 // extra stuff, for ease of 'joined' pages
 // 1-
