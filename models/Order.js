@@ -7,7 +7,6 @@ const sequelize = require(path.join(rootDir, "util", "database.js"));
 
 const Cart = require("./Cart");
 const CartItem = require("./CartItem");
-const User = require("./User");
 
 const Order = sequelize.define("order", {
   id: {
@@ -17,6 +16,7 @@ const Order = sequelize.define("order", {
     autoIncrement: true,
     unique: true,
   },
+  totalAmount: Sequelize.DOUBLE,
   shippingAddress: Sequelize.STRING,
 });
 
@@ -53,6 +53,15 @@ Order.createFromCart = async function (cartOrCartId) {
       through: { quantity: prod.cartItem.quantity },
     });
   }
+
+  const totalAmount = productsOfCart.reduce((accu, prod) => {
+    const quantity = prod.cartItem.quantity ?? 0;
+    const price = prod.price;
+
+    return quantity * price;
+  }, 0);
+
+  await newOrder.update({ totalAmount });
 
   return newOrder;
 };

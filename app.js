@@ -76,7 +76,7 @@ Product.hasMany(CartItem);
 CartItem.belongsTo(Product);
 
 // duplicating the Cart associations - for Order and OrderItem
-User.hasOne(Order);
+User.hasMany(Order);
 Order.belongsTo(User);
 Order.belongsToMany(Product, { through: OrderItem });
 Product.belongsToMany(Order, { through: OrderItem });
