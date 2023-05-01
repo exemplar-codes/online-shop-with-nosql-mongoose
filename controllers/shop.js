@@ -108,9 +108,7 @@ const postCart = async (req, res, next) => {
       cartItem.quantity += 1;
       await cartItem.save();
     } else {
-      const newCartItem = await cart.createCartItem({ quantity: 1 });
-      await newCartItem.setProduct(prodId);
-      await newCartItem.save();
+      await cart.addProduct(prodId, { through: { quantity: 1 } });
     }
   } else if (req.query.decrement) {
     if (!cartItem) return next(); // 404
