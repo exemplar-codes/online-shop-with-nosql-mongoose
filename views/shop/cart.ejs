@@ -3,7 +3,7 @@
     <h1 class="centered">Cart</h1>
     <main>
       <% if (products.length === 0) {%>
-        <h2>No products here!</h2>
+        <h2 class="centered">No products here!</h2>
       <% } else { %>
         <h2>
           <%
@@ -52,13 +52,13 @@
             <% } %>
           </tbody>
         </table>
-      <% } %>
 
-      <br />
-      <form action="/orders" method="POST" style="display: inline; margin: 0; padding: 0;">
-        <div class="centered" >
-          <button type="submit" class="btn">Order!</button>
-        </div>
-      </form>
+        <br />
+        <form action="/orders" method="POST" style="display: inline; margin: 0; padding: 0;">
+          <div class="centered" >
+            <button type="submit" class="btn">Order!</button>
+          </div>
+        </form>
+      <% } %>
     </main>
 <%- include('../includes/end.ejs') %>
