@@ -1,4 +1,3 @@
-const Cart = require("../models/Cart");
 const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
 const { extractKeys } = require("../util/common");
@@ -91,31 +90,35 @@ const checkoutPage = async (req, res, next) => {
 };
 
 const postCart = async (req, res, next) => {
+  const user = req.user;
+  const cart = await user.getCart();
   const prodId = req.body.productId;
-  const { price: productPrice } = await Product.findByPk(prodId);
 
-  if (req.query.decrement) {
-    await Cart.addProduct(prodId, productPrice, -1);
-    res.redirect("/cart");
-    return;
-  }
+  const productExists = !!(await cart.getProducts({ where: { id: prodId } }));
+  if (!productExists) return next();
 
-  if (req.query.delete) {
-    const productDeleteSuccessful = await Cart.deleteProduct(
-      prodId,
-      productPrice
-    );
-    if (!productDeleteSuccessful) {
-      res.status(402).redirect("/cart");
-    } else {
-      res.redirect("/cart");
+  // product exists
+  const [cartItem = null] = await cart.getCartItems({
+    where: { productId: prodId },
+  });
+
+  if (req.query.add) {
+    // default is add
+    let newCartItem = null;
+    if (!cartItem) {
+      newCartItem = await cart.createCartItem({ quantity: 0 });
+      await newCartItem.setProduct(prodId);
     }
+    (cartItem || newCartItem).quantity += 1;
+    await (cartItem || newCartItem)?.save();
+  } else if (req.query.decrement) {
+    if (!cartItem) return next(); // 404
 
-    return;
-  }
+    cartItem.quantity -= 1;
+    await cartItem.save();
+  } else if (req.query.delete) await cartItem?.destroy(); // idempotent
+  else return next();
 
-  // default is add
-  await Cart.addProduct(prodId, productPrice);
   res.redirect("/cart");
   return;
 };

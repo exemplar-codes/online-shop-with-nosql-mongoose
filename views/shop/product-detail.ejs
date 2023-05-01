@@ -8,7 +8,7 @@
       </div>
       <h2><%= prod.price %></h2>
       <p><%= prod.description %></p>
-      <form action="/cart" method="POST" style="display: inline; margin: 0; padding: 0;">
+      <form action="/cart?add=true" method="POST" style="display: inline; margin: 0; padding: 0;">
         <input type="hidden" name="productId"  value="<%= prod.id %>" />
         <button type="submit" class="btn">Add to Cart</button>
       </form>
