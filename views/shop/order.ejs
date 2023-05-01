@@ -1,0 +1,43 @@
+<%- include('../includes/head.ejs') %>
+<%- include('../includes/navigation.ejs') %>
+    <h1 class="centered">Order id <code><%= id %></code></h1>
+    <main>
+      <% if (products.length === 0) {%>
+        <h2>No products here!</h2>
+      <% } else { %>
+        <h2>
+          <%
+            const integer = Math.floor(totalPrice);
+            const fraction = Math.round((totalPrice - integer) * 100) / 100;
+            const displayPrice = integer + fraction;
+          %>
+          Total: $ <%= displayPrice %>
+        </h2>
+        <table class="centered" border="1">
+          <thead class="capitalize">
+            <tr>
+              <% for(keyName of Object.keys(products[0])) { %>
+                <th><%= keyName %></th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(prod of products) { %>
+              <tr>
+                <% for(value of Object.values(prod)) { %>
+                  <td><%= value %></td>
+                <% } %>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      <% } %>
+
+      <br />
+      <form action="/orders" method="POST" style="display: inline; margin: 0; padding: 0;">
+        <div class="centered" >
+          <button type="submit" class="btn">Order!</button>
+        </div>
+      </form>
+    </main>
+<%- include('../includes/end.ejs') %>

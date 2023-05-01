@@ -1,6 +1,7 @@
 const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const OrderItem = require("../models/CartItem");
 const { extractKeys, dateToTimeStampString } = require("../util/common");
 
 const indexPage = async (req, res, next) => {
@@ -94,10 +95,56 @@ const ordersPage = async (req, res, next) => {
     return beautifiedOrder;
   });
 
-  res.render("shop/orders", {
+  res.render("shop/order-list", {
     docTitle: "Orders",
     myActivePath: "/orders",
     orders,
+  });
+};
+
+const orderPage = async (req, res, next) => {
+  const user = req.user;
+  const orderId = req.params.orderId;
+  const [order = null] = await user.getOrders({ where: { id: orderId } });
+
+  if (!order) return next(); // no orders exist, 404
+
+  let products = await order.getProducts({
+    attributes: ["id", "title", "price", "imageUrl", "description"],
+    includes: {
+      model: [OrderItem],
+      attributes: ["quantity"],
+    },
+    raw: true,
+  });
+
+  products = products.map((prod) => {
+    return extractKeys(
+      prod,
+      [
+        "id",
+        "title",
+        "price",
+        "imageUrl",
+        "description",
+        "contentItem",
+        "orderItem.quantity",
+      ],
+      {
+        shortKeys: true,
+        removeAssociatedColumns: false,
+      }
+    );
+  });
+
+  const totalPrice = products.reduce((accum, prod) => accum + +prod.price, 0);
+
+  res.render("shop/order", {
+    docTitle: `Order id ${order.id}`,
+    id: orderId,
+    myActivePath: "",
+    totalPrice,
+    products: products,
   });
 };
 
@@ -163,4 +210,5 @@ module.exports = {
   checkoutEditPage,
   ordersPage,
   createOrder,
+  orderPage,
 };
