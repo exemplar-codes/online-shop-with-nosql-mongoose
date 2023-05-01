@@ -1,6 +1,7 @@
 const Cart = require("../models/Cart");
 const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
+const { extractKeys } = require("../util/common");
 
 const indexPage = async (req, res, next) => {
   res.render("shop/index", {
@@ -47,7 +48,7 @@ const cartPage = async (req, res, next) => {
   });
 
   products = products.map((prod) => {
-    const desiredKeys = [
+    return extractKeys(prod, [
       "id",
       "title",
       "price",
@@ -55,14 +56,7 @@ const cartPage = async (req, res, next) => {
       "description",
       "contentItem",
       "cartItem.quantity",
-    ];
-    return Object.entries(prod).reduce(
-      (accum, [k, v]) =>
-        desiredKeys.includes(k)
-          ? { ...accum, [k.split(".").at(-1)]: [v] }
-          : accum,
-      {}
-    );
+    ]);
   });
 
   const totalPrice = products.reduce((accum, prod) => accum + +prod.price, 0);
