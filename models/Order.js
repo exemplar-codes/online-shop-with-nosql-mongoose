@@ -54,11 +54,11 @@ Order.createFromCart = async function (cartOrCartId) {
     });
   }
 
-  const totalAmount = productsOfCart.reduce((accu, prod) => {
+  const totalAmount = productsOfCart.reduce((accum, prod) => {
     const quantity = prod.cartItem.quantity ?? 0;
     const price = prod.price;
 
-    return quantity * price;
+    return accum + quantity * price;
   }, 0);
 
   await newOrder.update({ totalAmount });

@@ -7,8 +7,8 @@
       <% } else { %>
         <h2>
           <%
-            const integer = Math.floor(totalPrice);
-            const fraction = Math.round((totalPrice - integer) * 100) / 100;
+            const integer = Math.floor(totalAmount);
+            const fraction = Math.round((totalAmount - integer) * 100) / 100;
             const displayPrice = integer + fraction;
           %>
           Total: $ <%= displayPrice %>
@@ -32,12 +32,5 @@
           </tbody>
         </table>
       <% } %>
-
-      <br />
-      <form action="/orders" method="POST" style="display: inline; margin: 0; padding: 0;">
-        <div class="centered" >
-          <button type="submit" class="btn">Order!</button>
-        </div>
-      </form>
     </main>
 <%- include('../includes/end.ejs') %>

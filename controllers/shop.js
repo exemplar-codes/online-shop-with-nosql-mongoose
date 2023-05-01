@@ -67,7 +67,12 @@ const cartPage = async (req, res, next) => {
     );
   });
 
-  const totalPrice = products.reduce((accum, prod) => accum + +prod.price, 0);
+  const totalPrice = products.reduce((accum, prod) => {
+    const quantity = prod["quantity"] ?? 0;
+    const price = prod.price;
+
+    return accum + quantity * price;
+  }, 0);
 
   res.render("shop/cart", {
     docTitle: "Cart",
@@ -137,13 +142,11 @@ const orderPage = async (req, res, next) => {
     );
   });
 
-  const totalPrice = products.reduce((accum, prod) => accum + +prod.price, 0);
-
   res.render("shop/order", {
     docTitle: `Order id ${order.id}`,
     id: orderId,
     myActivePath: "",
-    totalPrice,
+    totalAmount: order.totalAmount,
     products: products,
   });
 };
