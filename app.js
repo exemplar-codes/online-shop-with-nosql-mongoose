@@ -15,6 +15,8 @@ const Product = require("./models/Product");
 const User = require("./models/User");
 const Cart = require("./models/Cart");
 const CartItem = require("./models/CartItem");
+const Order = require("./models/Order");
+const OrderItem = require("./models/OrderItem");
 
 // app.set('view engine', 'pug');
 // app.set('views', 'views'); // not needed for this case, actually
@@ -72,6 +74,16 @@ CartItem.belongsTo(Cart);
 // adding to avoid wasting time on query method quirks
 Product.hasMany(CartItem);
 CartItem.belongsTo(Product);
+
+// duplicating the Cart associations - for Order and OrderItem
+User.hasOne(Order);
+Order.belongsTo(User);
+Order.belongsToMany(Product, { through: OrderItem });
+Product.belongsToMany(Order, { through: OrderItem });
+Order.hasMany(OrderItem);
+OrderItem.belongsTo(Order);
+Product.hasMany(OrderItem);
+OrderItem.belongsTo(Product);
 
 sequelize
   .sync()
