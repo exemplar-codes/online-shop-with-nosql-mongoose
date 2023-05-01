@@ -1,5 +1,6 @@
 const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
+const Order = require("../models/Order");
 const { extractKeys } = require("../util/common");
 
 const indexPage = async (req, res, next) => {
@@ -122,6 +123,14 @@ const postCart = async (req, res, next) => {
   return;
 };
 
+const createOrder = async (req, res, next) => {
+  const user = req.user;
+  const cart = await user.getCart();
+  await Order.createFromCart(cart);
+
+  res.redirect("/orders");
+};
+
 const checkoutEditPage = async (req, res, next) => {
   res.redirect("/");
 };
@@ -135,4 +144,5 @@ module.exports = {
   postCart,
   checkoutEditPage,
   ordersPage,
+  createOrder,
 };
