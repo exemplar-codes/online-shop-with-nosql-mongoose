@@ -47,11 +47,11 @@ async function populateDatabaseWithSampleData(x) {
 
   if (users.length > 0) return;
 
-  // create a user
+  // 1. create a user
   // const newUser = User.build(User.initialUsers[0]);
   // await newUser.save();
 
-  // create products associated with the user
+  // 2. create products associated with the user
   const initialProducts = Product.initialProducts;
   for (const sampleProd of initialProducts) {
     /**
@@ -76,13 +76,18 @@ async function populateDatabaseWithSampleData(x) {
   /**
    * Approach 3.1 - create the User, and associated Products all in one go
    */
-  await User.create(
+  const user = await User.create(
     {
       ...User.initialUsers[0],
       [Sequelize.Utils.pluralize(Product.name)]: initialProducts, // array of model instances would be OK too
     },
     { include: [{ model: Product }] }
   );
+
+  // 3. Create a cart for the User
+  const cart = await user.createCart(); // cart doesn't have own data columns, so fine.
+  // const [product] = await Product.findAll({ limit: 1 });
+  // await cart.addProduct(product);
 }
 
 // No need to write the following. Sequelize does this for us
