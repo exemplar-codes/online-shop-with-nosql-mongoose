@@ -1,4 +1,4 @@
-# online-shop-with-nosql ~~online-shop-express-ejs-mvc~~
+# online-shop-with-nosql [~~online-shop-express-ejs-mvc~~](https://github.com/exemplar-codes/online-shop-express-ejs-mvc)
 An Online shop app with realistic features, code.
 
 Focus of this project:
