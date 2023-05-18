@@ -1,5 +1,7 @@
 const path = require("path");
 
+const mongoConnect = require("./util/database.js");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -34,3 +36,11 @@ app.get("/try", async (req, res, next) => {
 // app.use(shopRoutes);
 
 // app.use(errorController.get404);
+
+// express code
+
+// start express from inside the mongoConnect callback
+mongoConnect((client) => {
+  console.log(client);
+  app.listen(3000);
+});
