@@ -44,8 +44,7 @@ mongoConnect(async (client) => {
   const db = getDb();
   console.log(db);
   // database setup code, if needed
-  await db
-    .collection("trial-collection")
+  db.collection("trial-collection")
     .insertOne({ name: "Woods", friendName: "Mason" })
     .then(console.log)
     .catch(console.log);
