@@ -42,12 +42,16 @@ app.get("/try", async (req, res, next) => {
 // start express from inside the mongoConnect callback
 mongoConnect(async (client) => {
   const db = getDb();
-  console.log(db);
-  // database setup code, if needed
-  db.collection("trial-collection")
-    .insertOne({ name: "Woods", friendName: "Mason" })
-    .then(console.log)
-    .catch(console.log);
+  const result = await db.collection("trial-collection").findOne();
+
+  const exists = !!result;
+
+  if (!exists) {
+    const createdResult = await db
+      .collection("trial-collection")
+      .insertOne({ name: "Woods", friendName: "Mason" });
+    console.log(createdResult);
+  } else console.log(result);
 
   app.listen(3000);
 });
