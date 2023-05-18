@@ -12,6 +12,7 @@ const app = express();
 // const shopRoutes = require("./routes/shop");
 // const errorController = require("./controllers/error");
 // const User = require("./models/User");
+const Product = require("./models/Product");
 
 // app.set('view engine', 'pug');
 // app.set('views', 'views'); // not needed for this case, actually
@@ -52,6 +53,22 @@ mongoConnect(async (client) => {
       .insertOne({ name: "Woods", friendName: "Mason" });
     console.log(createdResult);
   } else console.log(result);
+
+  // demo a model
+  const existingProduct = await db.collection("products").findOne();
+  if (existingProduct) {
+    console.log("Some products exists", existingProduct);
+  } else {
+    const newProduct = new Product(
+      "A book",
+      "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+      "This is an awesome book",
+      12.99
+    );
+
+    const productResult = await newProduct.create();
+    console.log(productResult);
+  }
 
   app.listen(3000);
 });
