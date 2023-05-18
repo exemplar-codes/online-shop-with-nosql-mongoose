@@ -40,7 +40,15 @@ app.get("/try", async (req, res, next) => {
 // express code
 
 // start express from inside the mongoConnect callback
-mongoConnect((client) => {
-  console.log(getDb());
+mongoConnect(async (client) => {
+  const db = getDb();
+  console.log(db);
+  // database setup code, if needed
+  await db
+    .collection("trial-collection")
+    .insertOne({ name: "Woods", friendName: "Mason" })
+    .then(console.log)
+    .catch(console.log);
+
   app.listen(3000);
 });

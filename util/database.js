@@ -9,7 +9,7 @@ const MongoClient = mongodb.MongoClient;
 
 let _db;
 
-const mongoConnect = (callback) => {
+const mongoConnect = (callback = () => {}) => {
   MongoClient.connect(
     `mongodb+srv://sanjarcode-nodejscompleteguide:${database_password}@cluster-nodejscompleteg.nuohpop.mongodb.net/?retryWrites=true&w=majority`
   ) // Copied from the site (SRV address)
