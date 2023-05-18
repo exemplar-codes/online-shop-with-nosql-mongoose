@@ -1,6 +1,6 @@
 const path = require("path");
 
-const mongoConnect = require("./util/database.js");
+const { mongoConnect, getDb } = require("./util/database.js");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -41,6 +41,6 @@ app.get("/try", async (req, res, next) => {
 
 // start express from inside the mongoConnect callback
 mongoConnect((client) => {
-  console.log(client);
+  console.log(getDb());
   app.listen(3000);
 });
