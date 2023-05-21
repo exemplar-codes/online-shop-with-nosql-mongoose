@@ -19,6 +19,33 @@ class Product {
       console.log(e);
     }
   }
+
+  /**
+   * Add a sample product
+   * Is idempotent, makes change only if database is empty
+   */
+  //
+  static async prepopulateProducts() {
+    const db = getDb();
+    const existingProduct = await db.collection("products").findOne();
+    if (existingProduct) {
+      console.log(
+        "No sample products added, since some exist",
+        existingProduct
+      );
+    } else {
+      const newProduct = new Product(
+        "A book",
+        "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+        "This is an awesome book",
+        12.99
+      );
+
+      const productResult = await newProduct.create();
+      console.log("Sample products added!");
+      console.log(productResult);
+    }
+  }
 }
 
 module.exports = Product;

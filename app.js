@@ -1,6 +1,10 @@
 const path = require("path");
 
-const { mongoConnect, getDb } = require("./util/database.js");
+const {
+  mongoConnect,
+  getDb,
+  prepopulateIrrelevantSampleData,
+} = require("./util/database.js");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -42,33 +46,8 @@ app.get("/try", async (req, res, next) => {
 
 // start express from inside the mongoConnect callback
 mongoConnect(async (client) => {
-  const db = getDb();
-  const result = await db.collection("trial-collection").findOne();
-
-  const exists = !!result;
-
-  if (!exists) {
-    const createdResult = await db
-      .collection("trial-collection")
-      .insertOne({ name: "Woods", friendName: "Mason" });
-    console.log(createdResult);
-  } else console.log(result);
-
-  // demo a model
-  const existingProduct = await db.collection("products").findOne();
-  if (existingProduct) {
-    console.log("Some products exists", existingProduct);
-  } else {
-    const newProduct = new Product(
-      "A book",
-      "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
-      "This is an awesome book",
-      12.99
-    );
-
-    const productResult = await newProduct.create();
-    console.log(productResult);
-  }
+  await prepopulateIrrelevantSampleData();
+  await Product.prepopulateProducts();
 
   app.listen(3000);
 });
