@@ -3,7 +3,7 @@ const rootDir = require("../util/path");
 const { getDb } = require(path.join(rootDir, "util", "database.js"));
 
 class Product {
-  constructor(price, title, description, imageUrl) {
+  constructor({ price = "", title = "", description = "", imageUrl = "" }) {
     this.price = price;
     this.title = title;
     this.description = description;
@@ -34,12 +34,13 @@ class Product {
         existingProduct
       );
     } else {
-      const newProduct = new Product(
-        "A book",
-        "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
-        "This is an awesome book",
-        12.99
-      );
+      const newProduct = new Product({
+        title: "A book",
+        imageUrl:
+          "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+        description: "This is an awesome book",
+        price: 12.99,
+      });
 
       const productResult = await newProduct.create();
       console.log("Sample products added!");
