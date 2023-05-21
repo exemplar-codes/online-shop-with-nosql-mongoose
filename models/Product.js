@@ -15,7 +15,6 @@ class Product {
 
     try {
       const allProducts = await db.collection("products").find().toArray();
-      console.log(allProducts);
       return allProducts;
     } catch (error) {
       console.log(error);

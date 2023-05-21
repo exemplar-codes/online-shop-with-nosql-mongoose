@@ -1,7 +1,7 @@
-const CartItem = require("../models/CartItem");
 const Product = require("../models/Product");
-const Order = require("../models/Order");
-const OrderItem = require("../models/CartItem");
+// const CartItem = require("../models/CartItem");
+// const Order = require("../models/Order");
+// const OrderItem = require("../models/CartItem");
 const { extractKeys, dateToTimeStampString } = require("../util/common");
 
 const indexPage = async (req, res, next) => {
@@ -12,7 +12,7 @@ const indexPage = async (req, res, next) => {
 };
 
 const getProducts = async (req, res, next) => {
-  const products = await Product.findAll();
+  const products = await Product.fetchAll();
 
   res.render("shop/product-list", {
     prods: products,
