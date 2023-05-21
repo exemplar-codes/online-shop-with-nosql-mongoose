@@ -24,9 +24,9 @@
         </p>
       </div>
       <div class="card__actions">
-        <a href="/products/<%= prod.id %>"><button class="btn">Details</button></a>
+        <a href="/products/<%= prod._id || prod.id %>"><button class="btn">Details</button></a>
         <form action="/cart?add=true" method="POST" style="display: inline; margin: 0; padding: 0;">
-          <input type="hidden" name="productId"  value="<%= prod.id %>" />
+          <input type="hidden" name="productId"  value="<%= prod._id || prod.id %>" />
           <button type="submit" class="btn">Add to Cart</button>
         </form>
       </div>

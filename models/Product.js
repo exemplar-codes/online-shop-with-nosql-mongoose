@@ -1,6 +1,7 @@
 const path = require("path");
 const rootDir = require("../util/path");
 const { getDb } = require(path.join(rootDir, "util", "database.js"));
+const mongodb = require("mongodb");
 
 class Product {
   constructor({ price = "", title = "", description = "", imageUrl = "" }) {
@@ -19,6 +20,16 @@ class Product {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  static async findById(prodId) {
+    const db = getDb();
+
+    const product = await db
+      .collection("products")
+      .findOne({ _id: new mongodb.ObjectId(prodId) }); // _id needs to be of type ObjectId
+
+    return product;
   }
 
   async create() {

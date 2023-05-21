@@ -21,7 +21,7 @@
                   <td><%- value ?? "<code>blank</code>" %></td>
                 <% } %>
                 <td>
-                  <a href="/orders/<%= order.id %>">Details</a>
+                  <a href="/orders/<%= order._id || order.id %>">Details</a>
                 </td>
               </tr>
             <% } %>
