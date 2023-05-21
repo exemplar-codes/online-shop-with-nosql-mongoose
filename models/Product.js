@@ -10,6 +10,18 @@ class Product {
     this.imageUrl = imageUrl;
   }
 
+  static async fetchAll() {
+    const db = getDb();
+
+    try {
+      const allProducts = await db.collection("products").find().toArray();
+      console.log(allProducts);
+      return allProducts;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async create() {
     const db = getDb();
     try {
