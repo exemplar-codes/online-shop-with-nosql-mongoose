@@ -50,8 +50,8 @@ app.use(errorController.get404);
 // start express from inside the mongoConnect callback
 mongoConnect(async (client) => {
   await prepopulateIrrelevantSampleData();
-  await Product.prepopulateProducts();
   await User.prepopulateUsers();
+  await Product.prepopulateProducts();
 
   app.listen(3000);
 });

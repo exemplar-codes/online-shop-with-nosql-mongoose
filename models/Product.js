@@ -2,6 +2,7 @@ const path = require("path");
 const rootDir = require("../util/path");
 const { getDb } = require(path.join(rootDir, "util", "database.js"));
 const mongodb = require("mongodb");
+const User = require("./User");
 
 class Product {
   constructor({
@@ -9,6 +10,7 @@ class Product {
     title = "",
     description = "",
     imageUrl = "",
+    userId = null,
     _id = null,
   }) {
     this.price = price;
@@ -16,6 +18,7 @@ class Product {
     this.description = description;
     this.imageUrl = imageUrl;
     this._id = _id ? new mongodb.ObjectId(_id) : _id;
+    this.userId = userId ? new mongodb.ObjectId(userId) : userId;
   }
 
   static async fetchAll() {
@@ -88,12 +91,14 @@ class Product {
         existingProduct
       );
     } else {
+      const [firstUser = null] = await User.fetchAll();
       const newProduct = new Product({
         title: "A book",
         imageUrl:
           "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
         description: "This is an awesome book",
         price: 12.99,
+        userId: firstUser._id,
       });
 
       const productResult = await newProduct.create();
