@@ -12,7 +12,7 @@ const cors = require("cors");
 
 const app = express();
 
-// const adminRoutes = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const errorController = require("./controllers/error");
 // const User = require("./models/User");
@@ -37,7 +37,7 @@ app.get("/try", async (req, res, next) => {
   return res.json({ time: new Date().toLocaleTimeString() });
 });
 
-// app.use("/admin", adminRoutes);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);

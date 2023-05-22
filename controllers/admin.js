@@ -1,8 +1,9 @@
 const Product = require("../models/Product");
 
 const getAdminProducts = async (req, res, next) => {
-  const admin = req.user;
-  const products = await admin.getProducts();
+  // const admin = req.user;
+  // const products = await admin.getProducts();
+  const products = await Product.fetchAll();
 
   res.render("admin/products", {
     prods: products,
