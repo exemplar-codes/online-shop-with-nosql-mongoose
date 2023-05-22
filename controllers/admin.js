@@ -22,8 +22,9 @@ const getAddProduct = (req, res, next) => {
 
 const getEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const admin = req.user;
-  const [product = null] = await admin.getProducts({ where: { id: prodId } });
+  // const admin = req.user;
+  // const [product = null] = await admin.getProducts({ where: { id: prodId } });
+  const product = await Product.findById(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
