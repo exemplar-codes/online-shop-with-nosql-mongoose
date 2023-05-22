@@ -41,13 +41,22 @@ const getEditProduct = async (req, res, next) => {
 };
 
 const postAddProduct = async (req, res, next) => {
-  const user = req.user;
-  await user.createProduct({
+  // const user = req.user;
+  // await user.createProduct({
+  //   title: req.body.title,
+  //   imageUrl: req.body.imageUrl,
+  //   description: req.body.description,
+  //   price: req.body.price,
+  // });
+
+  const product = new Product({
     title: req.body.title,
     imageUrl: req.body.imageUrl,
     description: req.body.description,
     price: req.body.price,
   });
+
+  product.create();
 
   res.redirect("/");
 };
