@@ -82,6 +82,22 @@ class Product {
    * Is idempotent, makes change only if database is empty
    */
   //
+  static SAMPLE_PRODUCTS = [
+    {
+      title: "A book",
+      price: "12.99",
+      imageUrl:
+        "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+      description: "This is an awesome book",
+    },
+    {
+      title: "A laptop",
+      price: "1000",
+      imageUrl:
+        "https://upload.wikimedia.org/wikipedia/commons/b/bb/Alienware_M14x_%282%29.jpg",
+      description: "A performant, quiet laptop",
+    },
+  ];
   static async prepopulateProducts() {
     const db = getDb();
     const existingProduct = await db.collection("products").findOne();
@@ -92,18 +108,16 @@ class Product {
       );
     } else {
       const [firstUser = null] = await User.fetchAll();
-      const newProduct = new Product({
-        title: "A book",
-        imageUrl:
-          "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
-        description: "This is an awesome book",
-        price: 12.99,
-        userId: firstUser._id,
-      });
+      Product.SAMPLE_PRODUCTS.forEach(async (sampleProd) => {
+        const newProduct = new Product({
+          ...sampleProd,
+          userId: firstUser._id,
+        });
 
-      const productResult = await newProduct.create();
+        const productResult = await newProduct.create();
+        console.log(productResult);
+      });
       console.log("Sample products added!");
-      console.log(productResult);
     }
   }
 }

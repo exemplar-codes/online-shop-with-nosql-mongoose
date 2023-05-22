@@ -47,6 +47,13 @@ class User {
     const result = await db.collection("users").deleteOne({ _id: this._id });
     return result;
   }
+
+  static SAMPLE_USERS = [
+    {
+      name: "SanjarOne",
+      email: "SanjarOne@gmail.com",
+    },
+  ];
   static async prepopulateUsers() {
     const db = getDb();
 
@@ -54,15 +61,14 @@ class User {
     if (existingUser) {
       console.log("No sample user added, since some exist", existingUser);
     } else {
-      const newUser = new User({
-        name: "SanjarOne",
-        email: "SanjarOne@gmail.com",
-      });
+      User.SAMPLE_USERS.forEach(async (sampleUser) => {
+        const newUser = new User(sampleUser);
 
-      const userResult = await newUser.create();
-      console.log("Sample user added!");
-      console.log(userResult);
+        const userResult = await newUser.create();
+        console.log(userResult);
+      });
     }
+    console.log("Sample user added!");
   }
 }
 
