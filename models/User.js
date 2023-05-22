@@ -1,50 +1,17 @@
-const Sequelize = require("sequelize");
+const mongodb = require("mongodb");
 
-const path = require("path");
-const rootDir = require("../util/path");
-const sequelize = require(path.join(rootDir, "util", "database.js"));
-
-const User = sequelize.define(
-  "user",
-  {
-    id: {
-      type: Sequelize.INTEGER,
-      autoIncrement: true,
-      allowNull: false,
-      primaryKey: true,
-      unique: true,
-    },
-
-    name: Sequelize.STRING,
-    email: Sequelize.STRING,
-  },
-  {
-    hooks: {
-      // afterSync: populateUsers,
-    },
+class User {
+  constructor({ _id = null, name = "", email = "" }) {
+    this._id = _id ? new mongodb.ObjectId(_id) : null;
+    this.name = name;
+    this.email = email;
   }
-);
-
-const initialUsers = [{ name: "SanjarOne", email: "SanjarOne@gmail.com" }];
-
-async function populateUsers() {
-  try {
-    const users = await User.findAll({ limit: 1 });
-
-    if (users.length > 0) return;
-
-    initialUsers.forEach(async (iuser) => {
-      delete iuser.id;
-      const newUser = User.build(iuser);
-      await newUser.save();
-    });
-    console.log("Sample user populated!");
-  } catch (error) {
-    console.log(error);
-    return;
-  }
+  static async fetchAll() {}
+  static async findById(userId) {}
+  async create() {}
+  async update() {}
+  async delete() {}
+  static async prepopulateUsers() {}
 }
 
 module.exports = User;
-module.exports.initialUsers = initialUsers;
-module.exports.populateUsers = populateUsers;
