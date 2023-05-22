@@ -27,10 +27,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 // mock authentication, i.e. get user who's making the request
-// app.use(async (req, res, next) => {
-//   req.user = await User.findByPk(1);
-//   next();
-// });
+app.use(async (req, res, next) => {
+  // req.user = await User.findById(1);
+  const [firstUser = null] = await User.fetchAll(); // as of now, this is the sample user
+  req.user = firstUser;
+  console.log("Mock authentication success", firstUser);
+  next();
+});
 
 app.get("/try", async (req, res, next) => {
   await new Promise((r) => setTimeout(r, 1000));
