@@ -85,23 +85,31 @@ const postEditProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const admin = req.user;
+  // const admin = req.user;
 
-  const productOwnedByAdmin = await admin.hasProduct(prodId);
+  // const productOwnedByAdmin = await admin.hasProduct(prodId);
 
-  if (productOwnedByAdmin) {
-    await admin.removeProduct(prodId); // dissociate
-    await Product.destroy({ where: { id: prodId } }); // destroy
+  // if (productOwnedByAdmin) {
+  //   await admin.removeProduct(prodId); // dissociate
+  //   await Product.destroy({ where: { id: prodId } }); // destroy
 
-    // FIXME: how know if operation succeeeded or not in Sequelize
-  }
+  //   // FIXME: how know if operation succeeeded or not in Sequelize
+  // }
 
-  if (productOwnedByAdmin) res.redirect("/");
-  else {
+  // if (productOwnedByAdmin) res.redirect("/");
+
+  const product = await Product.findById(prodId);
+
+  if (!product) {
     // 404 page
     next();
     return;
   }
+
+  await product.delete();
+
+  res.redirect("/");
+  return;
 };
 
 const deleteAllProducts = async (req, res, next) => {

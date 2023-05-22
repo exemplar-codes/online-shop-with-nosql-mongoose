@@ -63,6 +63,18 @@ class Product {
     }
   }
 
+  async delete() {
+    const db = getDb();
+    try {
+      await db
+        .collection("products")
+        .deleteOne({ _id: new mongodb.ObjectId(this._id) });
+      return result;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   /**
    * Add a sample product
    * Is idempotent, makes change only if database is empty
