@@ -15,7 +15,7 @@ const app = express();
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const errorController = require("./controllers/error");
-// const User = require("./models/User");
+const User = require("./models/User");
 const Product = require("./models/Product");
 
 // app.set('view engine', 'pug');
@@ -48,6 +48,7 @@ app.use(errorController.get404);
 mongoConnect(async (client) => {
   await prepopulateIrrelevantSampleData();
   await Product.prepopulateProducts();
+  await User.prepopulateUsers();
 
   app.listen(3000);
 });
