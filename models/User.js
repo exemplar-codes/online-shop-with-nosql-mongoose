@@ -48,6 +48,7 @@ class User {
     return result;
   }
 
+  // pre-population
   static SAMPLE_USERS = [
     {
       name: "SanjarOne",
@@ -59,16 +60,15 @@ class User {
 
     const existingUser = await db.collection("users").findOne();
     if (existingUser) {
-      console.log("No sample user added, since some exist", existingUser);
+      console.log("No sample user added, since some exist");
     } else {
       User.SAMPLE_USERS.forEach(async (sampleUser) => {
         const newUser = new User(sampleUser);
 
-        const userResult = await newUser.create();
-        console.log(userResult);
+        await newUser.create();
       });
+      console.log("Sample user/s added!");
     }
-    console.log("Sample user added!");
   }
 }
 

@@ -102,10 +102,7 @@ class Product {
     const db = getDb();
     const existingProduct = await db.collection("products").findOne();
     if (existingProduct) {
-      console.log(
-        "No sample products added, since some exist",
-        existingProduct
-      );
+      console.log("No sample products added, since some exist");
     } else {
       const [firstUser = null] = await User.fetchAll();
       Product.SAMPLE_PRODUCTS.forEach(async (sampleProd) => {
@@ -114,8 +111,7 @@ class Product {
           userId: firstUser._id,
         });
 
-        const productResult = await newProduct.create();
-        console.log(productResult);
+        await newProduct.create();
       });
       console.log("Sample products added!");
     }

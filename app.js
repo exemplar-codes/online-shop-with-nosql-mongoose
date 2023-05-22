@@ -52,6 +52,8 @@ mongoConnect(async (client) => {
   await prepopulateIrrelevantSampleData();
   await User.prepopulateUsers();
   await Product.prepopulateProducts();
+  console.log("Pre-scripts finished execution");
+  console.log("------------------------------");
 
   app.listen(3000);
 });
