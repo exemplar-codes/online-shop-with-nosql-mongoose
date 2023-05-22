@@ -4,11 +4,18 @@ const { getDb } = require(path.join(rootDir, "util", "database.js"));
 const mongodb = require("mongodb");
 
 class Product {
-  constructor({ price = "", title = "", description = "", imageUrl = "" }) {
+  constructor({
+    price = "",
+    title = "",
+    description = "",
+    imageUrl = "",
+    _id = null,
+  }) {
     this.price = price;
     this.title = title;
     this.description = description;
     this.imageUrl = imageUrl;
+    this._id = _id;
   }
 
   static async fetchAll() {
@@ -16,7 +23,7 @@ class Product {
 
     try {
       const allProducts = await db.collection("products").find().toArray();
-      return allProducts;
+      return allProducts.map((i) => new Product(i));
     } catch (error) {
       console.log(error);
     }
@@ -29,6 +36,8 @@ class Product {
       .collection("products")
       .findOne({ _id: new mongodb.ObjectId(prodId) }); // _id needs to be of type ObjectId
 
+    if (product) return new Product(product);
+
     return product;
   }
 
@@ -36,6 +45,18 @@ class Product {
     const db = getDb();
     try {
       const result = await db.collection("products").insertOne(this);
+      return result;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async update() {
+    const db = getDb();
+    try {
+      const result = await db
+        .collection("products")
+        .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
       return result;
     } catch (e) {
       console.log(e);

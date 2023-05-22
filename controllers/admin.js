@@ -54,8 +54,9 @@ const postAddProduct = async (req, res, next) => {
 
 const postEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
-  const admin = req.user;
-  const [product = null] = await admin.getProducts({ where: { id: prodId } });
+  // const admin = req.user;
+  // const [product = null] = await admin.getProducts({ where: { id: prodId } });
+  let product = await Product.findById(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -63,12 +64,12 @@ const postEditProduct = async (req, res, next) => {
     return;
   }
 
-  await product.update({
-    title: req.body.title,
-    imageUrl: req.body.imageUrl,
-    description: req.body.description,
-    price: req.body.price,
-  });
+  product.title = req.body.title;
+  product.imageUrl = req.body.imageUrl;
+  product.description = req.body.description;
+  product.price = req.body.price;
+
+  await product?.update();
 
   res.redirect("/");
 };
