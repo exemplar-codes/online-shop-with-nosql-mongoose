@@ -54,6 +54,7 @@ const postAddProduct = async (req, res, next) => {
     imageUrl: req.body.imageUrl,
     description: req.body.description,
     price: req.body.price,
+    userId: req.user._id,
   });
 
   product.create();
