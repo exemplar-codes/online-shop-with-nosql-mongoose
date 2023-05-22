@@ -15,7 +15,7 @@ class Product {
     this.title = title;
     this.description = description;
     this.imageUrl = imageUrl;
-    this._id = _id;
+    this._id = _id ? new mongodb.ObjectId(_id) : _id;
   }
 
   static async fetchAll() {
@@ -35,6 +35,7 @@ class Product {
     const product = await db
       .collection("products")
       .findOne({ _id: new mongodb.ObjectId(prodId) }); // _id needs to be of type ObjectId
+    // have to create ObjectId here, no other way
 
     if (product) return new Product(product);
 
@@ -56,7 +57,7 @@ class Product {
     try {
       const result = await db
         .collection("products")
-        .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
+        .updateOne({ _id: this._id }, { $set: this });
       return result;
     } catch (e) {
       console.log(e);
@@ -66,9 +67,7 @@ class Product {
   async delete() {
     const db = getDb();
     try {
-      await db
-        .collection("products")
-        .deleteOne({ _id: new mongodb.ObjectId(this._id) });
+      await db.collection("products").deleteOne({ _id: this._id });
       return result;
     } catch (e) {
       console.log(e);
