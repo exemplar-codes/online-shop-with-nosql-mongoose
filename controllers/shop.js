@@ -1,4 +1,6 @@
 const Product = require("../models/Product");
+const { getDb } = require("../util/database");
+const { ObjectId } = require("mongodb");
 // const CartItem = require("../models/CartItem");
 // const Order = require("../models/Order");
 // const OrderItem = require("../models/CartItem");
@@ -59,6 +61,56 @@ const cartPage = async (req, res, next) => {
     })
   );
 
+  const totalPrice = cartItemsWithQuantity?.reduce((accum, prod) => {
+    const quantity = prod["quantity"] ?? 0;
+    const price = prod.price;
+
+    return accum + quantity * price;
+  }, 0);
+
+  res.render("shop/cart", {
+    docTitle: "Cart",
+    myActivePath: "/cart",
+    totalPrice,
+    products: cartItemsWithQuantity ?? [],
+  });
+};
+
+const cartPageUsingIncludesOperator = async (req, res, next) => {
+  const user = req.user;
+  const cartItems = user.cart.items; // have to 'get' it since it's an association, not owned column
+
+  // #1, get full products for each cartItem (which only has productId)
+  const db = getDb();
+  const productIds = cartItems.map(
+    (cartItem) => new ObjectId(cartItem.productId)
+  );
+  const completeProductsInCartItems = await db
+    .collection("products")
+    .find({
+      _id: {
+        $in: productIds,
+        // order of this does not change return order
+        // it is always sorted according to _id
+      },
+    })
+    .toArray();
+
+  // #2, return order may not be correct, and since cartItems are expected to be ordered
+  // doing simple search
+  // I know O(n^2) but the main thing was demoing `$in` operator
+  const cartItemsWithQuantity = cartItems.map((cartItem) => {
+    const fullProductForCartItem = completeProductsInCartItems.find(
+      (product) => product._id.toString() === cartItem.productId.toString()
+    );
+
+    return {
+      ...fullProductForCartItem,
+      quantity: cartItem.quantity,
+    };
+  });
+
+  // #3 total to show
   const totalPrice = cartItemsWithQuantity?.reduce((accum, prod) => {
     const quantity = prod["quantity"] ?? 0;
     const price = prod.price;
@@ -202,6 +254,7 @@ module.exports = {
   indexPage,
   getProducts,
   cartPage,
+  cartPageUsingIncludesOperator,
   checkoutPage,
   getProduct,
   postCart,
