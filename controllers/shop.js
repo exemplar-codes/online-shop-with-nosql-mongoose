@@ -42,7 +42,7 @@ const cartPage = async (req, res, next) => {
 
   // map doesn't work with async functions, since the function evaluates to a promise
   // use Promise.all, no choice
-  const productsWithQuantity = await Promise.all(
+  const cartItemsWithQuantity = await Promise.all(
     cartItems.map(async (cartItem) => {
       const fullProduct = await Product.findById(cartItem.productId);
       const objectForCartView = extractKeys(
@@ -59,7 +59,7 @@ const cartPage = async (req, res, next) => {
     })
   );
 
-  const totalPrice = productsWithQuantity?.reduce((accum, prod) => {
+  const totalPrice = cartItemsWithQuantity?.reduce((accum, prod) => {
     const quantity = prod["quantity"] ?? 0;
     const price = prod.price;
 
@@ -70,7 +70,7 @@ const cartPage = async (req, res, next) => {
     docTitle: "Cart",
     myActivePath: "/cart",
     totalPrice,
-    products: productsWithQuantity ?? [],
+    products: cartItemsWithQuantity ?? [],
   });
 };
 
