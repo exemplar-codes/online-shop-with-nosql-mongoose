@@ -1,6 +1,9 @@
+/**
+ * Get array of objects with certain keys only
+ */
 const extractKeys = (
   argObject,
-  desiredKeysArr = ["id"],
+  desiredKeysArr = ["id", "_id"],
   { shortKeys = true, removeAssociatedColumns = true }
 ) => {
   return Object.entries(argObject).reduce((accum, [k, v]) => {

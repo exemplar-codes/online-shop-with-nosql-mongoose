@@ -38,36 +38,22 @@ const getProduct = async (req, res, next) => {
 
 const cartPage = async (req, res, next) => {
   const user = req.user;
-  const cart = await user.getCart(); // have to 'get' it since it's an association, not owned column
-  let products = await cart.getProducts({
-    attributes: ["id", "title", "price", "imageUrl", "description"],
-    includes: {
-      model: [CartItem],
-      attributes: ["quantity"],
-    },
-    raw: true,
-  });
-
-  products = products.map((prod) => {
-    return extractKeys(
+  const cartItems = user.cart.items; // have to 'get' it since it's an association, not owned column
+  const productsWithQuantity = await cartItems.map((prod) => {
+    const objectForCartView = extractKeys(
       prod,
-      [
-        "id",
-        "title",
-        "price",
-        "imageUrl",
-        "description",
-        "contentItem",
-        "cartItem.quantity",
-      ],
+      // keys of the cartItem
+      ["productId", "title", "price", "imageUrl", "description", "quantity"],
       {
         shortKeys: true,
         removeAssociatedColumns: false,
       }
     );
+    objectForCartView._id = objectForCartView.productId; // since productId is used for cartItem now
+    return objectForCartView;
   });
 
-  const totalPrice = products.reduce((accum, prod) => {
+  const totalPrice = productsWithQuantity.reduce((accum, prod) => {
     const quantity = prod["quantity"] ?? 0;
     const price = prod.price;
 
@@ -78,7 +64,7 @@ const cartPage = async (req, res, next) => {
     docTitle: "Cart",
     myActivePath: "/cart",
     totalPrice,
-    products: products,
+    products: productsWithQuantity,
   });
 };
 
@@ -160,32 +146,35 @@ const checkoutPage = async (req, res, next) => {
 
 const postCart = async (req, res, next) => {
   const user = req.user;
-  const cart = await user.getCart();
+  const cartItems = user.cart.items;
   const prodId = req.body.productId;
 
-  const productExists = !!(await cart.getProducts({ where: { id: prodId } }));
-  if (!productExists) return next();
+  const productThatExists = await Product.findById(prodId);
 
-  // product exists
-  const [cartItem = null] = await cart.getCartItems({
-    where: { productId: prodId },
-  });
+  if (!productThatExists) return next();
+
+  // product exists in cart
+  const matchingCartItem = cartItems.find(
+    (cartItem) => cartItem.productId?.toString() === prodId
+  );
+  // .toString since prodId from request is a string
 
   if (req.query.add) {
     // default is add
-    if (cartItem) {
-      cartItem.quantity += 1;
-      await cartItem.save();
-    } else {
-      await cart.addProduct(prodId, { through: { quantity: 1 } });
-    }
+    if (matchingCartItem) matchingCartItem.quantity += 1;
+    else cartItems.push({ productId: productThatExists._id, quantity: 1 });
   } else if (req.query.decrement) {
-    if (!cartItem) return next(); // 404
+    if (!matchingCartItem) return next(); // 404
 
-    cartItem.quantity -= 1;
-    await cartItem.save();
-  } else if (req.query.delete) await cartItem?.destroy(); // idempotent
+    matchingCartItem.quantity -= 1;
+  } else if (req.query.delete) {
+    user.cart.items = user.cart.items.filter(
+      (cartItem) => cartItem.productId?.toString() !== prodId
+    );
+  } // idempotent
   else return next();
+
+  await user.update(); // since cart is part of user
 
   res.redirect("/cart");
   return;

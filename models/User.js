@@ -4,10 +4,11 @@ const { getDb } = require(path.join(rootDir, "util", "database.js"));
 const mongodb = require("mongodb");
 
 class User {
-  constructor({ _id = null, name = "", email = "" }) {
+  constructor({ _id = null, name = "", email = "", cart = { items: [] } }) {
     this._id = _id ? new mongodb.ObjectId(_id) : null;
     this.name = name;
     this.email = email;
+    this.cart = cart;
   }
   // Note: omitting try-catch deliberately, for less clutter
   static async fetchAll() {
@@ -38,7 +39,9 @@ class User {
   async update() {
     const db = getDb();
 
-    const result = await db.collection("users").updateOne({ _id: this._id });
+    const result = await db
+      .collection("users")
+      .updateOne({ _id: this._id }, { $set: this });
     return result;
   }
   async delete() {

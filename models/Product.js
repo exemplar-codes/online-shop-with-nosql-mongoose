@@ -18,6 +18,7 @@ class Product {
     this.description = description;
     this.imageUrl = imageUrl;
     this._id = _id ? new mongodb.ObjectId(_id) : _id;
+    this.id = _id?.toString(); // not needed, but adding for safety (so stuff doesn't break in views)
     this.userId = userId ? new mongodb.ObjectId(userId) : userId;
   }
 
