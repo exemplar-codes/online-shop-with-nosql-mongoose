@@ -39,21 +39,27 @@ const getProduct = async (req, res, next) => {
 const cartPage = async (req, res, next) => {
   const user = req.user;
   const cartItems = user.cart.items; // have to 'get' it since it's an association, not owned column
-  const productsWithQuantity = await cartItems.map((prod) => {
-    const objectForCartView = extractKeys(
-      prod,
-      // keys of the cartItem
-      ["productId", "title", "price", "imageUrl", "description", "quantity"],
-      {
-        shortKeys: true,
-        removeAssociatedColumns: false,
-      }
-    );
-    objectForCartView._id = objectForCartView.productId; // since productId is used for cartItem now
-    return objectForCartView;
-  });
 
-  const totalPrice = productsWithQuantity.reduce((accum, prod) => {
+  // map doesn't work with async functions, since the function evaluates to a promise
+  // use Promise.all, no choice
+  const productsWithQuantity = await Promise.all(
+    cartItems.map(async (cartItem) => {
+      const fullProduct = await Product.findById(cartItem.productId);
+      const objectForCartView = extractKeys(
+        { ...fullProduct, ...cartItem },
+        // keys of the cartItem
+        ["_id", "title", "price", "imageUrl", "description", "quantity"],
+        {
+          shortKeys: true,
+          removeAssociatedColumns: false,
+        }
+      );
+
+      return objectForCartView;
+    })
+  );
+
+  const totalPrice = productsWithQuantity?.reduce((accum, prod) => {
     const quantity = prod["quantity"] ?? 0;
     const price = prod.price;
 
@@ -64,7 +70,7 @@ const cartPage = async (req, res, next) => {
     docTitle: "Cart",
     myActivePath: "/cart",
     totalPrice,
-    products: productsWithQuantity,
+    products: productsWithQuantity ?? [],
   });
 };
 
