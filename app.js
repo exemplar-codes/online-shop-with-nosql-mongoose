@@ -31,7 +31,10 @@ app.use(async (req, res, next) => {
   // req.user = await User.findById(1);
   const [firstUser = null] = await User.fetchAll(); // as of now, this is the sample user
   req.user = firstUser;
-  console.log("Mock authentication success", firstUser);
+  console.log("Mock authentication success", {
+    email: firstUser?.email,
+    id: firstUser?._id,
+  });
   next();
 });
 
