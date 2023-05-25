@@ -2,7 +2,6 @@ const path = require("path");
 const rootDir = require("../util/path");
 const { getDb } = require(path.join(rootDir, "util", "database.js"));
 const mongodb = require("mongodb");
-const User = require("./User");
 
 class Product {
   constructor({
@@ -99,22 +98,25 @@ class Product {
       description: "A performant, quiet laptop",
     },
   ];
-  static async prepopulateProducts() {
+  static async prepopulateProducts(sampleUser) {
     const db = getDb();
     const existingProduct = await db.collection("products").findOne();
     if (existingProduct) {
       console.log("No sample products added, since some exist");
+      return [];
     } else {
-      const [firstUser = null] = await User.fetchAll();
-      Product.SAMPLE_PRODUCTS.forEach(async (sampleProd) => {
-        const newProduct = new Product({
-          ...sampleProd,
-          userId: firstUser._id,
-        });
+      const createdSampleProducts = await Promise.all(
+        Product.SAMPLE_PRODUCTS.map(async (sampleProd) => {
+          const newProduct = new Product({
+            ...sampleProd,
+            userId: sampleUser._id,
+          });
 
-        await newProduct.create();
-      });
+          await newProduct.create();
+        })
+      );
       console.log("Sample products added!");
+      return createdSampleProducts;
     }
   }
 }

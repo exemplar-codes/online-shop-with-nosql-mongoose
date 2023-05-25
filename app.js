@@ -50,8 +50,8 @@ app.use(errorController.get404);
 // start express from inside the mongoConnect callback
 mongoConnect(async (client) => {
   await prepopulateIrrelevantSampleData();
-  await User.prepopulateUsers();
-  await Product.prepopulateProducts();
+  const firstSampleUser = await User.prepopulateUsers();
+  await Product.prepopulateProducts(firstSampleUser);
   console.log("Pre-scripts finished execution");
   console.log("------------------------------");
 
