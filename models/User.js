@@ -111,7 +111,7 @@ class User {
     await this.update();
   }
 
-  // order stuff
+  // cart utils
   // Note, this is added as a separate collection, and nothing was added to User class to indicate this
   // ideally this is not good, since User now has functionality (and) that's absent (not mentioned) in the constructor
   // but it's Ok for now. Alternatively, we could have created a new model called Order. But I'm skipping this for now
@@ -148,6 +148,23 @@ class User {
 
     return { items: cartItemsWithQuantity };
   }
+
+  async getCartTotal() {
+    // get full product, so we can access prices
+    const cartWithCompleteProducts = await this.getCartWithCompleteProducts();
+    const cartItemsWithProductPrices = cartWithCompleteProducts.items;
+
+    const totalPrice = cartItemsWithProductPrices.reduce((accum, prod) => {
+      const quantity = prod.quantity ?? 0;
+      const price = prod.price ?? -1;
+
+      return accum + quantity * price;
+    }, 0);
+
+    return totalPrice;
+  }
+
+  // order stuff
   async createOrder() {
     // aka add an Order
     const db = getDb();

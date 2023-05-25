@@ -83,12 +83,7 @@ const cartPageUsingIncludesOperator = async (req, res, next) => {
   const cartItemsWithQuantity = cartWithCompleteProducts.items;
 
   // #3 total to show
-  const totalPrice = cartItemsWithQuantity?.reduce((accum, prod) => {
-    const quantity = prod["quantity"] ?? 0;
-    const price = prod.price;
-
-    return accum + quantity * price;
-  }, 0);
+  const totalPrice = await user.getCartTotal();
 
   res.render("shop/cart", {
     docTitle: "Cart",
