@@ -68,17 +68,20 @@ class User {
     const existingUser = await db.collection("users").findOne();
     if (existingUser) {
       console.log("No sample user added, since some exist");
+      return existingUser;
     } else {
-      User.SAMPLE_USERS.forEach(async (sampleUser) => {
-        const newUser = new User(sampleUser); // on RAM
+      const [defaultSampleUser = null] = await Promise.all(
+        User.SAMPLE_USERS.map(async (sampleUser, idx) => {
+          const newUser = new User(sampleUser); // on RAM
 
-        const newlyCreatedUser = await newUser.create(); // from db
-        return newlyCreatedUser;
-      });
+          const newlyCreatedUser = await newUser.create(); // from db
+
+          return newlyCreatedUser;
+        })
+      );
       console.log("Sample user/s added!");
+      return defaultSampleUser;
     }
-
-    return existingUser;
   }
 }
 
