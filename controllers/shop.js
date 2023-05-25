@@ -78,37 +78,9 @@ const cartPage = async (req, res, next) => {
 
 const cartPageUsingIncludesOperator = async (req, res, next) => {
   const user = req.user;
-  const cartItems = user.cart.items; // have to 'get' it since it's an association, not owned column
 
-  // #1, get full products for each cartItem (which only has productId)
-  const db = getDb();
-  const productIds = cartItems.map(
-    (cartItem) => new ObjectId(cartItem.productId)
-  );
-  const completeProductsInCartItems = await db
-    .collection("products")
-    .find({
-      _id: {
-        $in: productIds,
-        // order of this does not change return order
-        // it is always sorted according to _id
-      },
-    })
-    .toArray();
-
-  // #2, return order may not be correct, and since cartItems are expected to be ordered
-  // doing simple search
-  // I know O(n^2) but the main thing was demoing `$in` operator
-  const cartItemsWithQuantity = cartItems.map((cartItem) => {
-    const fullProductForCartItem = completeProductsInCartItems.find(
-      (product) => product._id.toString() === cartItem.productId.toString()
-    );
-
-    return {
-      ...fullProductForCartItem,
-      quantity: cartItem.quantity,
-    };
-  });
+  const cartWithCompleteProducts = await user.getCartWithCompleteProducts();
+  const cartItemsWithQuantity = cartWithCompleteProducts.items;
 
   // #3 total to show
   const totalPrice = cartItemsWithQuantity?.reduce((accum, prod) => {

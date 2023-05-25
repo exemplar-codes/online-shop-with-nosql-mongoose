@@ -5,7 +5,16 @@ const mongodb = require("mongodb");
 const Product = require("./Product");
 
 class User {
-  constructor({ _id = null, name = "", email = "", cart = { items: [] } }) {
+  constructor({
+    _id = null,
+    name = "",
+    email = "",
+    cart = {
+      items: [
+        /* { productId, quantity } */
+      ],
+    },
+  }) {
     this._id = _id ? new mongodb.ObjectId(_id) : null;
     this.name = name;
     this.email = email;
@@ -103,11 +112,48 @@ class User {
   }
 
   // order stuff
+  async getCartWithCompleteProducts() {
+    const cartItems = this.cart.items; // have to 'get' it since it's an association, not owned column
+
+    // #1, get full products for each cartItem (which only has productId)
+    const db = getDb();
+    const productIds = cartItems.map((cartItem) => cartItem.productId);
+    const completeProductsInCartItems = await db
+      .collection("products")
+      .find({
+        _id: {
+          $in: productIds,
+          // order of this does not change return order
+          // it is always sorted according to _id
+        },
+      })
+      .toArray();
+
+    // #2, return order may not be correct, and since cartItems are expected to be ordered
+    // doing simple search
+    // I know O(n^2) but the main thing was demoing `$in` operator
+    const cartItemsWithQuantity = cartItems.map((cartItem) => {
+      const fullProductForCartItem = completeProductsInCartItems.find(
+        (product) => product._id.toString() === cartItem.productId.toString()
+      );
+
+      return {
+        ...fullProductForCartItem,
+        quantity: cartItem.quantity,
+      };
+    });
+
+    return { items: cartItemsWithQuantity };
+  }
   async createOrder() {
     // aka add an Order
     const db = getDb();
 
-    const orderToBeCreated = { userId: this._id, items: this.cart.items };
+    const cartWithCompleteProducts = await this.getCartWithCompleteProducts();
+    const orderToBeCreated = {
+      userId: this._id,
+      items: cartWithCompleteProducts.items,
+    };
     await db.collection("orders").insertOne(orderToBeCreated);
 
     return null;
