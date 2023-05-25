@@ -112,6 +112,9 @@ class User {
   }
 
   // order stuff
+  // Note, this is added as a separate collection, and nothing was added to User class to indicate this
+  // ideally this is not good, since User now has functionality (and) that's absent (not mentioned) in the constructor
+  // but it's Ok for now. Alternatively, we could have created a new model called Order. But I'm skipping this for now
   async getCartWithCompleteProducts() {
     const cartItems = this.cart.items; // have to 'get' it since it's an association, not owned column
 
