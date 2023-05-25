@@ -6,12 +6,13 @@ const extractKeys = (
   desiredKeysArr = ["id", "_id"],
   { shortKeys = true, removeAssociatedColumns = true }
 ) => {
-  return Object.entries(argObject).reduce((accum, [k, v]) => {
+  return desiredKeysArr.reduce((accum, k) => {
+    if (!argObject.hasOwnProperty(k)) return accum;
     if (!desiredKeysArr.includes(k)) return accum;
     if (removeAssociatedColumns && k.includes(".")) return accum;
 
     const key = shortKeys ? k.split(".").at(-1) : k;
-    accum[key] = v;
+    accum[key] = argObject[k];
 
     return accum;
   }, {});

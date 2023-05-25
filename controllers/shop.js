@@ -50,7 +50,7 @@ const cartPage = async (req, res, next) => {
       const objectForCartView = extractKeys(
         { ...fullProduct, ...cartItem },
         // keys of the cartItem
-        ["_id", "title", "price", "imageUrl", "description", "quantity"],
+        ["_id", "title", "imageUrl", "description", "price", "quantity"],
         {
           shortKeys: true,
           removeAssociatedColumns: false,
@@ -80,7 +80,21 @@ const cartPageUsingIncludesOperator = async (req, res, next) => {
   const user = req.user;
 
   const cartWithCompleteProducts = await user.getCartWithCompleteProducts();
-  const cartItemsWithQuantity = cartWithCompleteProducts.items;
+  const cartItemsWithQuantity = cartWithCompleteProducts.items.map(
+    (cartItem) => {
+      const objectForCartView = extractKeys(
+        cartItem,
+        // keys of the cartItem
+        ["_id", "title", "imageUrl", "description", "price", "quantity"],
+        {
+          shortKeys: true,
+          removeAssociatedColumns: false,
+        }
+      );
+
+      return objectForCartView;
+    }
+  );
 
   // #3 total to show
   const totalPrice = await user.getCartTotal();
@@ -130,14 +144,7 @@ const orderPage = async (req, res, next) => {
   products = products.map((prod) => {
     return extractKeys(
       prod,
-      [
-        "_id",
-        "title",
-        "price",
-        "imageUrl",
-        "quantity",
-        "description",
-      ],
+      ["_id", "title", "price", "imageUrl", "quantity", "description"],
       {
         shortKeys: true,
         removeAssociatedColumns: false,
