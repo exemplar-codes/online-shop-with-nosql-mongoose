@@ -206,7 +206,20 @@ class User {
     return null;
   }
   async getOrders() {
-    return [];
+    const db = getDb();
+    return await db
+      .collection("orders")
+      .find({
+        userId: this._id,
+      })
+      .toArray();
+  }
+  async getOrder(orderId) {
+    const db = getDb();
+    const order = await db.collection("orders").findOne({
+      _id: new mongodb.ObjectId(orderId),
+    });
+    return order;
   }
 
   // pre-population

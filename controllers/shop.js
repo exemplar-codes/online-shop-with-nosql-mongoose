@@ -95,12 +95,12 @@ const cartPageUsingIncludesOperator = async (req, res, next) => {
 
 const ordersPage = async (req, res, next) => {
   const user = req.user;
-  let orders = await user.getOrders({ raw: true });
+  let orders = await user.getOrders();
 
   orders = orders.map((order) => {
     const beautifiedOrder = extractKeys(
       order,
-      ["id", "totalAmount", "shippingAddress", "createdAt"],
+      ["_id", "totalAmount", "shippingAddress", "createdAt"],
       {
         removeAssociatedColumns: true,
       }
@@ -121,30 +121,22 @@ const ordersPage = async (req, res, next) => {
 const orderPage = async (req, res, next) => {
   const user = req.user;
   const orderId = req.params.orderId;
-  const [order = null] = await user.getOrders({ where: { id: orderId } });
+  const order = await user.getOrder(orderId);
 
   if (!order) return next(); // no orders exist, 404
 
-  let products = await order.getProducts({
-    attributes: ["id", "title", "price", "imageUrl", "description"],
-    includes: {
-      model: [OrderItem],
-      attributes: ["quantity"],
-    },
-    raw: true,
-  });
+  let products = order.items;
 
   products = products.map((prod) => {
     return extractKeys(
       prod,
       [
-        "id",
+        "_id",
         "title",
         "price",
         "imageUrl",
+        "quantity",
         "description",
-        "contentItem",
-        "orderItem.quantity",
       ],
       {
         shortKeys: true,
