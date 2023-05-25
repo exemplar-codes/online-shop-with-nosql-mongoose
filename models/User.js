@@ -2,6 +2,7 @@ const path = require("path");
 const rootDir = require("../util/path");
 const { getDb } = require(path.join(rootDir, "util", "database.js"));
 const mongodb = require("mongodb");
+const Product = require("./Product");
 
 class User {
   constructor({ _id = null, name = "", email = "", cart = { items: [] } }) {
@@ -53,6 +54,52 @@ class User {
 
     const result = await db.collection("users").deleteOne({ _id: this._id });
     return result;
+  }
+
+  // cart stuff
+  async addProductToCart(prodId, quantityDelta = 1) {
+    const cartItems = this.cart.items;
+
+    const productThatExists = await Product.findById(prodId);
+
+    if (!productThatExists) return null;
+
+    // product exists in cart
+    const matchingCartItem = cartItems.find(
+      (cartItem) => cartItem.productId?.toString() === prodId
+    );
+
+    // add
+    if (matchingCartItem) matchingCartItem.quantity += 1;
+    else
+      cartItems.push({
+        productId: productThatExists._id,
+        quantity: quantityDelta,
+      });
+
+    await this.update();
+  }
+
+  async decrementProductFromCart(prodId, quantityDelta = 1) {
+    const cartItems = this.cart.items;
+
+    // product exists in cart
+    const matchingCartItem = cartItems.find(
+      (cartItem) => cartItem.productId?.toString() === prodId
+    );
+
+    matchingCartItem.quantity -= quantityDelta;
+
+    if (matchingCartItem.quantity <= 0) await this.deleteItemFromCart(prodId);
+    else await this.update();
+  }
+
+  async deleteItemFromCart(prodId) {
+    this.cart.items = this.cart.items.filter(
+      (cartItem) => cartItem.productId?.toString() !== prodId
+    );
+
+    await this.update();
   }
 
   // pre-population

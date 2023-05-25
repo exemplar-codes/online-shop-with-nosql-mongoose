@@ -204,35 +204,18 @@ const checkoutPage = async (req, res, next) => {
 
 const postCart = async (req, res, next) => {
   const user = req.user;
-  const cartItems = user.cart.items;
   const prodId = req.body.productId;
+  const quantityDelta = req.body.quantity ?? 1;
 
-  const productThatExists = await Product.findById(prodId);
-
-  if (!productThatExists) return next();
-
-  // product exists in cart
-  const matchingCartItem = cartItems.find(
-    (cartItem) => cartItem.productId?.toString() === prodId
-  );
-  // .toString since prodId from request is a string
-
+  // refactored logic from here into models
+  // "fat models, skinny controllers"
   if (req.query.add) {
-    // default is add
-    if (matchingCartItem) matchingCartItem.quantity += 1;
-    else cartItems.push({ productId: productThatExists._id, quantity: 1 });
+    await user.addProductToCart(prodId, quantityDelta);
   } else if (req.query.decrement) {
-    if (!matchingCartItem) return next(); // 404
-
-    matchingCartItem.quantity -= 1;
+    await user.decrementProductFromCart(prodId, quantityDelta);
   } else if (req.query.delete) {
-    user.cart.items = user.cart.items.filter(
-      (cartItem) => cartItem.productId?.toString() !== prodId
-    );
-  } // idempotent
-  else return next();
-
-  await user.update(); // since cart is part of user
+    await user.deleteItemFromCart(prodId);
+  }
 
   res.redirect("/cart");
   return;
