@@ -14,12 +14,27 @@ class User {
         /* { productId, quantity } */
       ],
     },
+    defaultShippingAddress = null,
   }) {
     this._id = _id ? new mongodb.ObjectId(_id) : null;
     this.name = name;
     this.email = email;
     this.cart = cart;
+
+    // associated orders (structure)
+    // [
+    //   {
+    //     userId: this._id,
+    //     items: cartWithCompleteProducts.items,
+    //     totalAmount: 0,
+    //     shippingAddress,
+    //     createdAt,
+    //   },
+    // ];
+    this.defaultShippingAddress =
+      defaultShippingAddress ?? "5230 Newell Road, CA";
   }
+
   // Note: omitting try-catch deliberately, for less clutter
   static async fetchAll() {
     const db = getDb();
@@ -165,16 +180,28 @@ class User {
   }
 
   // order stuff
-  async createOrder() {
+  async createOrder(currentShippingAddress = this.defaultShippingAddress) {
     // aka add an Order
     const db = getDb();
 
     const cartWithCompleteProducts = await this.getCartWithCompleteProducts();
+    const totalAmount = await this.getCartTotal();
+
     const orderToBeCreated = {
       userId: this._id,
       items: cartWithCompleteProducts.items,
+      totalAmount,
+      shippingAddress: currentShippingAddress,
+      createdAt: new Date().toISOString(),
     };
     await db.collection("orders").insertOne(orderToBeCreated);
+
+    // empty the cart
+    this.cart = {
+      items: [],
+    };
+
+    await this.update();
 
     return null;
   }

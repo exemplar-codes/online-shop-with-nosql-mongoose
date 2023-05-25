@@ -190,7 +190,8 @@ const postCart = async (req, res, next) => {
 
 const createOrder = async (req, res, next) => {
   const user = req.user;
-  await user.createOrder();
+  const currentShippingAddress = req.body.shippingAddress;
+  await user.createOrder(currentShippingAddress);
 
   res.redirect("/orders");
 };
