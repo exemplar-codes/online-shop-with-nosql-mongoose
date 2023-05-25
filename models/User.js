@@ -23,7 +23,7 @@ class User {
 
     const user = await db
       .collection("users")
-      .findOne({ _id: mongodb.ObjectId(userId) });
+      .findOne({ _id: new mongodb.ObjectId(userId) });
 
     if (user) return new User(user);
     return user;
@@ -31,10 +31,14 @@ class User {
   async create() {
     const db = getDb();
 
-    const newUser = await db.collection("users").insertOne(this);
+    const { insertedId = null } = await db.collection("users").insertOne(this);
 
-    if (newUser) return new User(newUser);
-    return newUser;
+    // have to make an extra call to get the created document, it's just how MongoDB works
+    const newlyCreatedUser = await User.findById(insertedId);
+
+    // return as class instance
+    if (newlyCreatedUser) return new User(newlyCreatedUser);
+    return null;
   }
   async update() {
     const db = getDb();
@@ -66,12 +70,15 @@ class User {
       console.log("No sample user added, since some exist");
     } else {
       User.SAMPLE_USERS.forEach(async (sampleUser) => {
-        const newUser = new User(sampleUser);
+        const newUser = new User(sampleUser); // on RAM
 
-        await newUser.create();
+        const newlyCreatedUser = await newUser.create(); // from db
+        return newlyCreatedUser;
       });
       console.log("Sample user/s added!");
     }
+
+    return existingUser;
   }
 }
 
