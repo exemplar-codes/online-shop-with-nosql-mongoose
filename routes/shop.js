@@ -14,7 +14,7 @@ router.get("/cart", shopController.cartPageUsingIncludesOperator);
 // router.get("/orders/:orderId", shopController.orderPage);
 
 router.post("/cart", shopController.postCart);
-// router.post("/orders", shopController.createOrder);
+router.post("/orders", shopController.createOrder);
 // router.put("/checkout", shopController.checkoutEditPage);
 
 module.exports = router;

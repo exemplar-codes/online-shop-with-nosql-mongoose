@@ -223,8 +223,7 @@ const postCart = async (req, res, next) => {
 
 const createOrder = async (req, res, next) => {
   const user = req.user;
-  const cart = await user.getCart();
-  await Order.createFromCart(cart);
+  await user.createOrder();
 
   res.redirect("/orders");
 };

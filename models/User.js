@@ -102,6 +102,20 @@ class User {
     await this.update();
   }
 
+  // order stuff
+  async createOrder() {
+    // aka add an Order
+    const db = getDb();
+
+    const orderToBeCreated = { userId: this._id, items: this.cart.items };
+    await db.collection("orders").insertOne(orderToBeCreated);
+
+    return null;
+  }
+  async getOrders() {
+    return [];
+  }
+
   // pre-population
   static SAMPLE_USERS = [
     {
