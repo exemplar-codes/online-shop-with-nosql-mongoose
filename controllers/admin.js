@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 
 const getAdminProducts = async (req, res, next) => {
+  // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const products = await admin.getProducts();
   const products = await Product.fetchAll();
@@ -22,6 +23,7 @@ const getAddProduct = (req, res, next) => {
 
 const getEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
+  // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
   const product = await Product.findById(prodId);
@@ -41,6 +43,7 @@ const getEditProduct = async (req, res, next) => {
 };
 
 const postAddProduct = async (req, res, next) => {
+  // Sequelize code, NOT USED NOW, left for observation
   // const user = req.user;
   // await user.createProduct({
   //   title: req.body.title,
@@ -64,6 +67,8 @@ const postAddProduct = async (req, res, next) => {
 
 const postEditProduct = async (req, res, next) => {
   const prodId = req.params.productId;
+
+  // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
   let product = await Product.findById(prodId);
@@ -86,6 +91,7 @@ const postEditProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   const prodId = req.params.productId;
+  // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
 
   // const productOwnedByAdmin = await admin.hasProduct(prodId);
