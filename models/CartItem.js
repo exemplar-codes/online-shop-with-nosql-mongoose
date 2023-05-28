@@ -1,3 +1,4 @@
+// NOT USED ANYMORE (in mongodb version of this app)
 const Sequelize = require("sequelize");
 
 const path = require("path");
