@@ -3,8 +3,8 @@ const path = require("path");
 const {
   mongooseConnect,
   getDb,
+  prepopulateIrrelevantSampleData,
   // mongoConnect,
-  // prepopulateIrrelevantSampleData,
 } = require("./util/database.js");
 
 const express = require("express");
@@ -16,8 +16,8 @@ const app = express();
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const errorController = require("./controllers/error");
-const User = require("./models/User");
-const Product = require("./models/Product");
+const { User, prepopulateUsers } = require("./models/User");
+const { Product, prepopulateProducts } = require("./models/Product");
 
 // app.set('view engine', 'pug');
 // app.set('views', 'views'); // not needed for this case, actually
@@ -62,19 +62,12 @@ app.use(errorController.get404);
 //   app.listen(3000);
 // });
 
-mongooseConnect(async (client) => {
-  const firstSampleUser = new User({
-    name: "SanjarMongoose",
-    email: "SanjarMongoose@forest.com",
-  });
+mongooseConnect(async (mongooseObject) => {
+  await prepopulateIrrelevantSampleData();
+  const firstSampleUser = await prepopulateUsers();
+  await prepopulateProducts(firstSampleUser);
 
-  // raw MongoDB command
-  const db = getDb();
-  await db.collection("users").insertOne({
-    name: "1",
-    email: "1@forest.com",
-  });
-  const result = await firstSampleUser.save();
-  console.log(result);
+  console.log("Pre-scripts finished execution");
+  console.log("------------------------------");
   app.listen(3000);
 });

@@ -1,14 +1,56 @@
 const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema({
-  price: { type: String, required: true },
-  title: { type: Number, required: true },
+  price: { type: Number, required: true },
+  title: { type: String, required: true },
   description: { type: String, required: true },
   imageUrl: { type: String, required: true },
+  userId: { type: String, required: true },
 });
 
 const Product = mongoose.model("Product", productSchema);
 
-module.exports = Product;
+// pre-population - adding as a standalone function, for now
+const SAMPLE_PRODUCTS = [
+  {
+    title: "A book",
+    price: 12.99,
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+    description: "This is an awesome book",
+  },
+  {
+    title: "A laptop",
+    price: 1000,
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/b/bb/Alienware_M14x_%282%29.jpg",
+    description: "A performant, quiet laptop",
+  },
+];
+const prepopulateProducts = async (sampleUser) => {
+  const existingProduct = await Product.findOne();
+  if (existingProduct) {
+    console.log("No sample products added, since some exist");
+    return [];
+  } else {
+    const createdSampleProducts = await Promise.all(
+      SAMPLE_PRODUCTS.map(async (sampleProd) => {
+        const newProduct = new Product({
+          ...sampleProd,
+
+          userId: sampleUser._id, // skipping for now, we'll add associations later
+          // Mongoose will exclude userId (it won't be saved), since userId is not mentioned in the Schema
+          // no errors or warning are shown
+        });
+
+        await newProduct.save();
+      })
+    );
+    console.log("Sample products added!");
+    return createdSampleProducts;
+  }
+};
+
+module.exports = { Product, prepopulateProducts };
 
 // Note: Code below is not being used, left for comparison
 

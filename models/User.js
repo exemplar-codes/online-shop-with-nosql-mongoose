@@ -5,7 +5,34 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", UserSchema);
 
-module.exports = User;
+const SAMPLE_USERS = [
+  {
+    name: "SanjarOne",
+    email: "SanjarOne@gmail.com",
+  },
+];
+const prepopulateUsers = async () => {
+  const existingUser = await User.findOne();
+  if (existingUser) {
+    console.log("No sample user added, since some exist");
+    return existingUser;
+  } else {
+    const [defaultSampleUser = null] = await Promise.all(
+      SAMPLE_USERS.map(async (sampleUser, idx) => {
+        const newUser = new User(sampleUser); // on RAM
+
+        const newlyCreatedUser = await newUser.save(); // from db
+        // Mongoose returns the full created instance, unlike MongoDB. Convenient
+
+        return newlyCreatedUser;
+      })
+    );
+    console.log("Sample user/s added!");
+    return defaultSampleUser;
+  }
+};
+
+module.exports = { User, prepopulateUsers };
 
 // Note: Code below is not being used, left for comparison
 

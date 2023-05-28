@@ -27,7 +27,29 @@ const getDb = () => {
   throw "No database found!";
 };
 
-module.exports = { mongooseConnect, getDb };
+const prepopulateIrrelevantSampleData = async () => {
+  const db = getDb();
+  const result = await db.collection("trial-collection").findOne();
+
+  const exists = !!result;
+
+  if (!exists) {
+    const createdResult = await db
+      .collection("trial-collection")
+      .insertOne({ name: "Woods", friendName: "Mason" });
+    console.log("Database was empty, added sample irrelevant data");
+    console.log(createdResult);
+  } else {
+    console.log("Database has data, no changes made");
+    // console.log(result);
+  }
+};
+
+module.exports = {
+  mongooseConnect,
+  getDb,
+  prepopulateIrrelevantSampleData,
+};
 
 // Note: Code below is not being used, left for comparison
 // const mongodb = require("mongodb");
