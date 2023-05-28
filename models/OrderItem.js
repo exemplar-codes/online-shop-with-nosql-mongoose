@@ -1,3 +1,4 @@
+// NOT USED ANYMORE (in mongodb version of this app)
 // duplicated from models/CartItem
 const Sequelize = require("sequelize");
 
