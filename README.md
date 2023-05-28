@@ -9,3 +9,5 @@ Focus of this project:
 5. ~~Rewrite the app using these~~
 6. Explore Mongoose
 7. Rewrite the app using it
+
+Note: Using a new cluster for this
