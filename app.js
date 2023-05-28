@@ -1,9 +1,10 @@
 const path = require("path");
 
 const {
-  mongoConnect,
-  getDb,
-  prepopulateIrrelevantSampleData,
+  // mongoConnect,
+  // getDb,
+  // prepopulateIrrelevantSampleData,
+  mongooseConnect,
 } = require("./util/database.js");
 
 const express = require("express");
@@ -50,13 +51,23 @@ app.use(errorController.get404);
 
 // express code
 
-// start express from inside the mongoConnect callback
-mongoConnect(async (client) => {
-  await prepopulateIrrelevantSampleData();
-  const firstSampleUser = await User.prepopulateUsers();
-  await Product.prepopulateProducts(firstSampleUser);
-  console.log("Pre-scripts finished execution");
-  console.log("------------------------------");
+// // start express from inside the mongoConnect callback
+// mongoConnect(async (client) => {
+//   await prepopulateIrrelevantSampleData();
+//   const firstSampleUser = await User.prepopulateUsers();
+//   await Product.prepopulateProducts(firstSampleUser);
+//   console.log("Pre-scripts finished execution");
+//   console.log("------------------------------");
 
+//   app.listen(3000);
+// });
+
+mongooseConnect(async (client) => {
+  const firstSampleUser = new User({
+    name: "SanjarMongoose",
+    email: "SanjarMongoose@forest.com",
+  });
+  const result = await firstSampleUser.save();
+  console.log(result);
   app.listen(3000);
 });
