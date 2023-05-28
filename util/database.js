@@ -6,15 +6,28 @@ const database_password = env["MONGODB_PASSWORD"];
 
 const mongoose = require("mongoose");
 
+let _db;
+
 const mongooseConnect = (cb) =>
   mongoose
     .connect(
       `mongodb+srv://sanjarcode-nodejscompleteguide:${database_password}@cluster-nodejscompleteg.nuohpop.mongodb.net/?retryWrites=true&w=majority`
     )
+    .then((mongooseObject) => {
+      const mongoDbClient = mongooseObject.connection.getClient();
+      _db = mongoDbClient.db();
+    })
     .then(cb)
     .catch(console.log);
 
-module.exports = { mongooseConnect };
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw "No database found!";
+};
+
+module.exports = { mongooseConnect, getDb };
 
 // Note: Code below is not being used, left for comparison
 // const mongodb = require("mongodb");

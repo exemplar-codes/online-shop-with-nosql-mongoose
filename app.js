@@ -1,10 +1,10 @@
 const path = require("path");
 
 const {
-  // mongoConnect,
-  // getDb,
-  // prepopulateIrrelevantSampleData,
   mongooseConnect,
+  getDb,
+  // mongoConnect,
+  // prepopulateIrrelevantSampleData,
 } = require("./util/database.js");
 
 const express = require("express");
@@ -66,6 +66,13 @@ mongooseConnect(async (client) => {
   const firstSampleUser = new User({
     name: "SanjarMongoose",
     email: "SanjarMongoose@forest.com",
+  });
+
+  // raw MongoDB command
+  const db = getDb();
+  await db.collection("users").insertOne({
+    name: "1",
+    email: "1@forest.com",
   });
   const result = await firstSampleUser.save();
   console.log(result);
