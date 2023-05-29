@@ -24,7 +24,7 @@ const getProducts = async (req, res, next) => {
 };
 
 const getProduct = async (req, res, next) => {
-  const product = await Product.findOne({ _id: req.params.productId }); // string _id works, but only when passed in an object
+  const product = await Product.findById(req.params.productId); // string _id works, but only when passed in an object
 
   if (!product) {
     next(); // for not found route
@@ -46,7 +46,7 @@ const cartPage = async (req, res, next) => {
   // use Promise.all, no choice
   const cartItemsWithQuantity = await Promise.all(
     cartItems.map(async (cartItem) => {
-      const fullProduct = await Product.findOne({ _id: cartItem.productId });
+      const fullProduct = await Product.findById(cartItem.productId);
       const objectForCartView = extractKeys(
         { ...fullProduct, ...cartItem },
         // keys of the cartItem
