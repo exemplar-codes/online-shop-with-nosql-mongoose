@@ -4,7 +4,7 @@ const getAdminProducts = async (req, res, next) => {
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const products = await admin.getProducts();
-  const products = await Product.fetchAll();
+  const products = await Product.find();
 
   res.render("admin/products", {
     prods: products,
@@ -26,7 +26,7 @@ const getEditProduct = async (req, res, next) => {
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
-  const product = await Product.findById(prodId);
+  const product = await Product.findOne({ _id: prodId });
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -71,7 +71,7 @@ const postEditProduct = async (req, res, next) => {
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
-  let product = await Product.findById(prodId);
+  let product = await Product.findOne({ _id: prodId });
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -105,7 +105,7 @@ const deleteProduct = async (req, res, next) => {
 
   // if (productOwnedByAdmin) res.redirect("/");
 
-  const product = await Product.findById(prodId);
+  const product = await Product.findOne({ _id: prodId });
 
   if (!product) {
     // 404 page
