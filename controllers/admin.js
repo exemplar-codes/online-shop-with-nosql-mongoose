@@ -1,11 +1,16 @@
 const { Product } = require("../models/Product");
+const mongoose = require("mongoose");
 
 const getAdminProducts = async (req, res, next) => {
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const products = await admin.getProducts();
-  const admin = req.user;
-  const products = await admin.fetchAllAssociatedProducts();
+
+  // Note: for now, everyone is an admin and can edit everything, we'll re-add associated user later
+  // const admin = req.user;
+  // const products = await admin.fetchAllAssociatedProducts();
+
+  const products = await Product.find();
 
   res.render("admin/products", {
     prods: products,
@@ -26,9 +31,14 @@ const getEditProduct = async (req, res, next) => {
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
-  const admin = req.user;
+
+  // Note: for now, everyone is an admin and can edit everything, we'll re-add associated user later
+  // const admin = req.user;
+  // const prodId = req.params.productId;
+  // const product = await admin.fetchAssociatedProductById(prodId);
+
   const prodId = req.params.productId;
-  const product = await admin.fetchAssociatedProductById(prodId);
+  const product = await Product.findById(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -75,8 +85,20 @@ const postEditProduct = async (req, res, next) => {
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
 
-  // to check if product exists and the user is it's creator
-  let product = await admin.fetchAssociatedProductById(prodId);
+  // // to check if product exists and the user is it's creator
+  // let product = await admin.fetchAssociatedProductById(prodId);
+
+  // Note: for now, everyone is an admin and can edit everything, we'll re-add associated user later
+  // const product = await Product.findById(prodId);
+  const product = await Product.findByIdAndUpdate(
+    new mongoose.mongo.ObjectId(prodId),
+    {
+      title: req.body.title,
+      imageUrl: req.body.imageUrl,
+      description: req.body.description,
+      price: req.body.price,
+    }
+  );
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -84,12 +106,12 @@ const postEditProduct = async (req, res, next) => {
     return;
   }
 
-  product.title = req.body.title;
-  product.imageUrl = req.body.imageUrl;
-  product.description = req.body.description;
-  product.price = req.body.price;
+  // product.title = req.body.title;
+  // product.imageUrl = req.body.imageUrl;
+  // product.description = req.body.description;
+  // product.price = req.body.price;
 
-  await product?.update();
+  // await product.save();
 
   res.redirect("/");
 };
@@ -111,8 +133,11 @@ const deleteProduct = async (req, res, next) => {
 
   // if (productOwnedByAdmin) res.redirect("/");
 
-  // to check if product exists and the user is it's creator
-  const product = await admin.fetchAssociatedProductById(prodId);
+  // // to check if product exists and the user is it's creator
+  // const product = await admin.fetchAssociatedProductById(prodId);
+
+  // Note: for now, everyone is an admin and can edit everything, we'll re-add associated user later
+  const product = await Product.findByIdAndDelete(prodId);
 
   if (!product) {
     // 404 page
@@ -120,16 +145,16 @@ const deleteProduct = async (req, res, next) => {
     return;
   }
 
-  await product.delete();
-
   res.redirect("/");
   return;
 };
 
 const deleteAllProducts = async (req, res, next) => {
   const admin = req.user;
-  await admin.deleteAllAssociatedProducts();
+  // await admin.deleteAllAssociatedProducts();
 
+  // Note: for now, everyone is an admin and can edit everything, we'll re-add associated user later
+  await Product.deleteMany();
   res.redirect("/");
 };
 
