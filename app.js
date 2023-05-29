@@ -30,7 +30,7 @@ app.use(cors());
 // mock authentication, i.e. get user who's making the request
 app.use(async (req, res, next) => {
   // req.user = await User.findById(1);
-  const [firstUser = null] = await User.fetchAll(); // as of now, this is the sample user
+  const [firstUser = null] = await User.find(); // as of now, this is the sample user
   req.user = firstUser;
   console.log("Mock authentication success", {
     email: firstUser?.email,
