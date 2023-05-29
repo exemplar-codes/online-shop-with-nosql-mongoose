@@ -1,10 +1,11 @@
-const Product = require("../models/Product");
+const { Product } = require("../models/Product");
 
 const getAdminProducts = async (req, res, next) => {
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const products = await admin.getProducts();
-  const products = await Product.find();
+  const admin = req.user;
+  const products = await admin.fetchAllAssociatedProducts();
 
   res.render("admin/products", {
     prods: products,
@@ -22,11 +23,12 @@ const getAddProduct = (req, res, next) => {
 };
 
 const getEditProduct = async (req, res, next) => {
-  const prodId = req.params.productId;
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
-  const product = await Product.findOne({ _id: prodId });
+  const admin = req.user;
+  const prodId = req.params.productId;
+  const product = await admin.fetchAssociatedProductById(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -66,12 +68,15 @@ const postAddProduct = async (req, res, next) => {
 };
 
 const postEditProduct = async (req, res, next) => {
+  const admin = req.user;
   const prodId = req.params.productId;
 
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
   // const [product = null] = await admin.getProducts({ where: { id: prodId } });
-  let product = await Product.findOne({ _id: prodId });
+
+  // to check if product exists and the user is it's creator
+  let product = await admin.fetchAssociatedProductById(prodId);
 
   if (!product) {
     // end middleware, hopefully 404 will run ahead
@@ -90,6 +95,7 @@ const postEditProduct = async (req, res, next) => {
 };
 
 const deleteProduct = async (req, res, next) => {
+  const admin = req.user;
   const prodId = req.params.productId;
   // Sequelize code, NOT USED NOW, left for observation
   // const admin = req.user;
@@ -105,7 +111,8 @@ const deleteProduct = async (req, res, next) => {
 
   // if (productOwnedByAdmin) res.redirect("/");
 
-  const product = await Product.findOne({ _id: prodId });
+  // to check if product exists and the user is it's creator
+  const product = await admin.fetchAssociatedProductById(prodId);
 
   if (!product) {
     // 404 page
@@ -121,7 +128,7 @@ const deleteProduct = async (req, res, next) => {
 
 const deleteAllProducts = async (req, res, next) => {
   const admin = req.user;
-  await admin.setProducts([]);
+  await admin.deleteAllAssociatedProducts();
 
   res.redirect("/");
 };

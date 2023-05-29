@@ -117,6 +117,32 @@ module.exports = { User, prepopulateUsers };
 //     const result = await db.collection("users").deleteOne({ _id: this._id });
 //     return result;
 //   }
+//   async fetchAllAssociatedProducts() {
+//     const db = getDb();
+
+//     const associatedProducts = await db
+//       .collection("products")
+//       .find({ userId: this._id })
+//       .toArray();
+
+//     return associatedProducts.map((u) => new Product(u));
+//   }
+//   async fetchAssociatedProductById(productId) {
+//     const db = getDb();
+
+//     const associatedProduct = await db
+//       .collection("products")
+//       .findOne({ userId: this._id, _id: new mongodb.ObjectId(productId) }); //647504b0d89f6938f0a3b59f
+
+//     if (!associatedProduct) return null;
+
+//     return new Product(associatedProduct);
+//   }
+//   async deleteAllAssociatedProducts() {
+//     const db = getDb();
+
+//     await db.collection("products").deleteOne({ userId: this._id });
+//   }
 
 //   // cart stuff
 //   async addProductToCart(prodId, quantityDelta = 1) {
