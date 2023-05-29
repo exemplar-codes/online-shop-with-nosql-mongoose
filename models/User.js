@@ -1,7 +1,21 @@
 const mongoose = require("mongoose");
-const UserSchema = new mongoose.Schema({
+const Schema = mongoose.Schema;
+
+const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
+  cart: {
+    items: [
+      {
+        productId: {
+          // types needed here because we are at the last level
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+      },
+    ],
+  },
 });
 const User = mongoose.model("User", UserSchema);
 
