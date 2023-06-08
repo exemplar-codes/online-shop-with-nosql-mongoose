@@ -9,8 +9,8 @@ const getAdminProducts = async (req, res, next) => {
   // Note: for now, everyone is an admin and can edit everything, we'll re-add associated user later
   // const admin = req.user;
   // const products = await admin.fetchAllAssociatedProducts();
-
-  const products = await Product.find();
+  const admin = req.user;
+  const products = await Product.find({ userId: admin._id });
 
   res.render("admin/products", {
     prods: products,
