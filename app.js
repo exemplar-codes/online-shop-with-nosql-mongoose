@@ -67,6 +67,16 @@ mongooseConnect(async (mongooseObject) => {
   const firstSampleUser = await prepopulateUsers();
   await prepopulateProducts(firstSampleUser);
 
+  let dropEverything = false;
+  // dropEverything = true; // uncomment and comment to wipe database
+  if (dropEverything) {
+    const db = getDb();
+    // delete the users and products collections
+    await db.collection("products").drop();
+    await db.collection("users").drop();
+    await db.collection("trial-collection").drop();
+  }
+
   console.log("Pre-scripts finished execution");
   console.log("------------------------------");
   app.listen(3000);
