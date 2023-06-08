@@ -1,4 +1,12 @@
 const { Product } = require("../models/Product");
+const {
+  User,
+  addProductToCart,
+  decrementProductFromCart,
+  deleteItemFromCart,
+  getCartWithCompleteProducts,
+  getCartTotal,
+} = require("../models/User");
 const { getDb } = require("../util/database");
 const { ObjectId } = require("mongodb");
 // const CartItem = require("../models/CartItem");
@@ -14,7 +22,7 @@ const indexPage = async (req, res, next) => {
 };
 
 const getProducts = async (req, res, next) => {
-  const products = await Product.find();
+  const products = await Product.find().lean();
 
   res.render("shop/product-list", {
     prods: products,
@@ -79,7 +87,8 @@ const cartPage = async (req, res, next) => {
 const cartPageUsingIncludesOperator = async (req, res, next) => {
   const user = req.user;
 
-  const cartWithCompleteProducts = await user.getCartWithCompleteProducts();
+  const cartWithCompleteProducts = await getCartWithCompleteProducts(user);
+
   const cartItemsWithQuantity = cartWithCompleteProducts.items.map(
     (cartItem) => {
       const objectForCartView = extractKeys(
@@ -97,7 +106,7 @@ const cartPageUsingIncludesOperator = async (req, res, next) => {
   );
 
   // #3 total to show
-  const totalPrice = await user.getCartTotal();
+  const totalPrice = await getCartTotal(user);
 
   res.render("shop/cart", {
     docTitle: "Cart",
@@ -176,11 +185,11 @@ const postCart = async (req, res, next) => {
   // refactored logic from here into models
   // "fat models, skinny controllers"
   if (req.query.add) {
-    await user.addProductToCart(prodId, quantityDelta);
+    await addProductToCart(user, prodId, quantityDelta);
   } else if (req.query.decrement) {
-    await user.decrementProductFromCart(prodId, quantityDelta);
+    await decrementProductFromCart(user, prodId, quantityDelta);
   } else if (req.query.delete) {
-    await user.deleteItemFromCart(prodId);
+    await deleteItemFromCart(user, prodId);
   }
 
   res.redirect("/cart");

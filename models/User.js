@@ -1,28 +1,27 @@
 const mongoose = require("mongoose");
+const { Product } = require("./Product");
 const Schema = mongoose.Schema;
+
+const CartItem = new Schema({
+  productId: { type: Schema.Types.ObjectId, required: true },
+  quantity: { type: Number, required: true },
+});
 
 const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   cart: {
-    items: [
-      {
-        productId: {
-          // types needed here because we are at the last level
-          type: Schema.Types.ObjectId,
-          required: true,
-        },
-        quantity: { type: Number, required: true },
-      },
-    ],
+    items: [CartItem],
   },
 });
+
 const User = mongoose.model("User", UserSchema);
 
 const SAMPLE_USERS = [
   {
     name: "SanjarOne",
     email: "SanjarOne@gmail.com",
+    cart: { items: [] },
   },
 ];
 const prepopulateUsers = async () => {
@@ -46,7 +45,117 @@ const prepopulateUsers = async () => {
   }
 };
 
-module.exports = { User, prepopulateUsers };
+// cart stuff
+const addProductToCart = async (userInstance, prodId, quantityDelta = 1) => {
+  const cartItems = userInstance.cart.items;
+
+  const productThatExists = await Product.findById(prodId);
+
+  if (!productThatExists) return null;
+
+  // product exists in cart
+  const matchingCartItem = cartItems.find(
+    (cartItem) => cartItem.productId?.toString() === prodId
+  );
+
+  // add
+  if (matchingCartItem) matchingCartItem.quantity += 1;
+  else
+    cartItems.push({
+      productId: productThatExists._id,
+      quantity: quantityDelta,
+    });
+
+  await userInstance.save();
+};
+
+const decrementProductFromCart = async (
+  userInstance,
+  prodId,
+  quantityDelta = 1
+) => {
+  const cartItems = userInstance.cart.items;
+
+  // product exists in cart
+  const matchingCartItem = cartItems.find(
+    (cartItem) => cartItem.productId?.toString() === prodId
+  );
+
+  matchingCartItem.quantity -= quantityDelta;
+
+  if (matchingCartItem.quantity <= 0)
+    await deleteItemFromCart(userInstance, prodId);
+  else await userInstance.save();
+};
+
+const deleteItemFromCart = async (userInstance, prodId) => {
+  userInstance.cart.items = userInstance.cart.items.filter(
+    (cartItem) => cartItem.productId?.toString() !== prodId
+  );
+
+  await userInstance.save();
+};
+
+// cart utils
+// Note, this is added as a separate collection, and nothing was added to User class to indicate this
+// ideally this is not good, since User now has functionality (and) that's absent (not mentioned) in the constructor
+// but it's Ok for now. Alternatively, we could have created a new model called Order. But I'm skipping this for now
+const getCartWithCompleteProducts = async (userInstance) => {
+  const cartItems = userInstance.cart.items; // have to 'get' it since it's an association, not owned column
+
+  // #1, get full products for each cartItem (which only has productId)
+  const productIds = cartItems.map((cartItem) => cartItem.productId);
+  const completeProductsInCartItems = await Product.find({
+    _id: {
+      $in: productIds,
+      // order of this does not change return order
+      // it is always sorted according to _id
+    },
+  }).lean(); // important, otherwise have to access stuff using `.doc`
+
+  // #2, return order may not be correct, and since cartItems are expected to be ordered
+  // doing simple search
+  // I know O(n^2) but the main thing was demoing `$in` operator
+  const cartItemsWithQuantity = cartItems.map((cartItem) => {
+    const fullProductForCartItem = completeProductsInCartItems.find(
+      (product) => product._id.toString() === cartItem.productId.toString()
+    );
+    return {
+      ...fullProductForCartItem,
+      quantity: cartItem.quantity,
+    };
+  });
+
+  return { items: cartItemsWithQuantity };
+};
+
+const getCartTotal = async (userInstance) => {
+  // get full product, so we can access prices
+  const cartWithCompleteProducts = await getCartWithCompleteProducts(
+    userInstance
+  );
+  const cartItemsWithProductPrices = cartWithCompleteProducts.items;
+
+  const totalPrice = cartItemsWithProductPrices.reduce((accum, prod) => {
+    const quantity = prod.quantity ?? 0;
+    const price = prod.price ?? -1;
+
+    return accum + quantity * price;
+  }, 0);
+
+  return totalPrice;
+};
+
+module.exports = {
+  User,
+  prepopulateUsers,
+
+  addProductToCart,
+  decrementProductFromCart,
+  deleteItemFromCart,
+  getCartWithCompleteProducts,
+  getCartTotal,
+};
 
 // Note: Code below is not being used, left for comparison
 
