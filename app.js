@@ -62,6 +62,7 @@ app.use(errorController.get404);
 //   app.listen(3000);
 // });
 
+let ranOnceAlready = false;
 mongooseConnect(async (mongooseObject) => {
   await prepopulateIrrelevantSampleData();
   const firstSampleUser = await prepopulateUsers();
@@ -78,6 +79,15 @@ mongooseConnect(async (mongooseObject) => {
     await db.collection("carts").drop();
 
     console.log("Database cleared!");
+  }
+
+  let runOnce = false;
+  // runOnce = true; // for running custom startup code - uncomment and comment to run
+  if (runOnce && !ranOnceAlready) {
+    // run custom startup code here
+
+    ranOnceAlready = true;
+    console.log("runOnce ran!");
   }
 
   console.log("Pre-scripts finished execution");
