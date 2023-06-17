@@ -1,18 +1,14 @@
 const mongoose = require("mongoose");
-const { Product } = require("./Product");
+const ObjectId = mongoose.Types.ObjectId;
 const Schema = mongoose.Schema;
 
-const CartItem = new Schema({
-  productId: { type: Schema.Types.ObjectId, required: true },
-  quantity: { type: Number, required: true },
-});
+const { Product } = require("./Product");
+const Cart = require("./Cart");
 
 const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  cart: {
-    items: [CartItem],
-  },
+  cartId: { ref: "Cart", type: Schema.Types.ObjectId, required: true },
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -21,7 +17,7 @@ const SAMPLE_USERS = [
   {
     name: "SanjarOne",
     email: "SanjarOne@gmail.com",
-    cart: { items: [] },
+    cartId: null, // { items: [] }, // won't work directly, since the cart is a ref
   },
 ];
 const prepopulateUsers = async () => {
@@ -31,9 +27,11 @@ const prepopulateUsers = async () => {
     return existingUser;
   } else {
     const [defaultSampleUser = null] = await Promise.all(
-      SAMPLE_USERS.map(async (sampleUser, idx) => {
+      SAMPLE_USERS.map(async (sampleUser) => {
         const newUser = new User(sampleUser); // on RAM
+        const newCart = await Cart.create(sampleUser.cart);
 
+        newUser.cartId = newCart._id;
         const newlyCreatedUser = await newUser.save(); // from db
         // Mongoose returns the full created instance, unlike MongoDB. Convenient
 
@@ -47,7 +45,18 @@ const prepopulateUsers = async () => {
 
 // cart stuff
 const addProductToCart = async (userInstance, prodId, quantityDelta = 1) => {
-  const cartItems = userInstance.cart.items;
+  userInstance = await User.findOne({
+    _id: userInstance._id,
+  })
+    .populate("cartId")
+    .lean();
+
+  const cart = await Cart.findOne(
+    userInstance.cartId instanceof ObjectId
+      ? userInstance.cartId
+      : userInstance.cartId._id
+  );
+  const cartItems = cart.items;
 
   const productThatExists = await Product.findById(prodId);
 
@@ -59,14 +68,24 @@ const addProductToCart = async (userInstance, prodId, quantityDelta = 1) => {
   );
 
   // add
-  if (matchingCartItem) matchingCartItem.quantity += 1;
-  else
-    cartItems.push({
-      productId: productThatExists._id,
-      quantity: quantityDelta,
+  if (matchingCartItem) {
+    await Cart.updateOne(
+      { _id: cart._id, "items._id": matchingCartItem._id },
+      {
+        $set: {
+          "items.$.quantity": matchingCartItem.quantity + quantityDelta,
+        },
+      }
+    );
+  } else {
+    await Cart.findByIdAndUpdate(cart._id, {
+      $push: {
+        items: { productId: productThatExists._id, quantity: quantityDelta },
+      },
     });
+  }
 
-  await userInstance.save();
+  await userInstance?.save?.();
 };
 
 const decrementProductFromCart = async (
@@ -74,26 +93,34 @@ const decrementProductFromCart = async (
   prodId,
   quantityDelta = 1
 ) => {
-  const cartItems = userInstance.cart.items;
+  return await addProductToCart(userInstance, prodId, -quantityDelta);
 
-  // product exists in cart
-  const matchingCartItem = cartItems.find(
-    (cartItem) => cartItem.productId?.toString() === prodId
-  );
+  // userInstance = await User.findOne({
+  //   _id: userInstance._id,
+  // })
+  //   .populate("cartId")
+  //   .lean();
+  // const cart = userInstance.cartId;
+  // const cartItems = cart.items;
 
-  matchingCartItem.quantity -= quantityDelta;
+  // // product exists in cart
+  // const matchingCartItem = cartItems.find(
+  //   (cartItem) => cartItem.productId?.toString() === prodId
+  // );
 
-  if (matchingCartItem.quantity <= 0)
-    await deleteItemFromCart(userInstance, prodId);
-  else await userInstance.save();
+  // matchingCartItem.quantity -= quantityDelta;
+
+  // if (matchingCartItem.quantity <= 0)
+  //   await deleteItemFromCart(userInstance, prodId);
+  // else await userInstance.save();
 };
 
 const deleteItemFromCart = async (userInstance, prodId) => {
-  userInstance.cart.items = userInstance.cart.items.filter(
-    (cartItem) => cartItem.productId?.toString() !== prodId
-  );
-
-  await userInstance.save();
+  await Cart.findByIdAndUpdate(userInstance.cartId, {
+    $pull: {
+      items: { productId: new ObjectId(prodId) },
+    },
+  });
 };
 
 // cart utils
@@ -101,7 +128,13 @@ const deleteItemFromCart = async (userInstance, prodId) => {
 // ideally this is not good, since User now has functionality (and) that's absent (not mentioned) in the constructor
 // but it's Ok for now. Alternatively, we could have created a new model called Order. But I'm skipping this for now
 const getCartWithCompleteProducts = async (userInstance) => {
-  const cartItems = userInstance.cart.items; // have to 'get' it since it's an association, not owned column
+  userInstance = await User.findOne({
+    _id: userInstance._id,
+  })
+    .populate("cartId")
+    .lean();
+  const cart = userInstance.cartId;
+  const cartItems = cart.items; // have to 'get' it since it's an association, not owned column
 
   // #1, get full products for each cartItem (which only has productId)
   const productIds = cartItems.map((cartItem) => cartItem.productId);
