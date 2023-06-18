@@ -13,6 +13,8 @@ const { ObjectId } = require("mongodb");
 // const Order = require("../models/Order");
 // const OrderItem = require("../models/CartItem");
 const { extractKeys, dateToTimeStampString } = require("../util/common");
+const { Order } = require("../models/Order");
+const Cart = require("../models/Cart");
 
 const indexPage = async (req, res, next) => {
   res.render("shop/index", {
@@ -118,7 +120,9 @@ const cartPageUsingIncludesOperator = async (req, res, next) => {
 
 const ordersPage = async (req, res, next) => {
   const user = req.user;
-  let orders = await user.getOrders();
+  // let orders = await user.getOrders(); // used with MONGODB
+
+  let orders = await Order.find({ userId: user._id }).lean();
 
   orders = orders.map((order) => {
     const beautifiedOrder = extractKeys(
@@ -144,13 +148,9 @@ const ordersPage = async (req, res, next) => {
 const orderPage = async (req, res, next) => {
   const user = req.user;
   const orderId = req.params.orderId;
-  const order = await user.getOrder(orderId);
 
-  if (!order) return next(); // no orders exist, 404
-
-  let products = order.items;
-
-  products = products.map((prod) => {
+  const order = await Order.findById(orderId).lean();
+  const products = order.items.map((prod) => {
     return extractKeys(
       prod,
       ["_id", "title", "price", "imageUrl", "quantity", "description"],
@@ -160,9 +160,27 @@ const orderPage = async (req, res, next) => {
       }
     );
   });
+  // MONGODB - start (not used now)
+  // const order = await user.getOrder(orderId);
+
+  // if (!order) return next(); // no orders exist, 404
+
+  // let products = order.items;
+
+  // products = products.map((prod) => {
+  //   return extractKeys(
+  //     prod,
+  //     ["_id", "title", "price", "imageUrl", "quantity", "description"],
+  //     {
+  //       shortKeys: true,
+  //       removeAssociatedColumns: false,
+  //     }
+  //   );
+  // });
+  // MONGODB - end
 
   res.render("shop/order", {
-    docTitle: `Order id ${order.id}`,
+    docTitle: `Order id ${order.id || order._id}`,
     id: orderId,
     myActivePath: "",
     totalAmount: order.totalAmount,
@@ -199,7 +217,32 @@ const postCart = async (req, res, next) => {
 const createOrder = async (req, res, next) => {
   const user = req.user;
   const currentShippingAddress = req.body.shippingAddress;
-  await user.createOrder(currentShippingAddress);
+  // await user.createOrder(currentShippingAddress);
+
+  const cart = await getCartWithCompleteProducts(user);
+  const totalPrice = await getCartTotal(user);
+
+  await Order.create({
+    userId: user._id,
+    items: cart.items.map((item) => {
+      return {
+        price: item.price,
+        title: item.title,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        userId: item.userId,
+        quantity: item.quantity,
+      };
+    }),
+    totalAmount: totalPrice,
+    shippingAddress: currentShippingAddress ?? "",
+  });
+
+  // clear the cart items
+  const cartId = user.cartId._id;
+  await Cart.findByIdAndUpdate(cartId, {
+    $pull: { items: {} },
+  });
 
   res.redirect("/orders");
 };
