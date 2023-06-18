@@ -77,6 +77,7 @@ mongooseConnect(async (mongooseObject) => {
     await db.collection("users").drop();
     await db.collection("trial-collection").drop();
     await db.collection("carts").drop();
+    await db.collection("orders").drop();
 
     console.log("Database cleared!");
   }
