@@ -1,27 +1,32 @@
 const mongoose = require("mongoose");
 
 // an order is a frozen copy of a cart
-const OrderSchema = new mongoose.Schema({
-  userId: { ref: "User", type: mongoose.Types.ObjectId, required: true },
-  shippingAddress: { type: String, required: false },
-  items: [
-    {
-      price: { type: Number, required: true },
-      title: { type: String, required: true },
-      description: { type: String, required: true },
-      imageUrl: { type: String, required: true },
+const OrderSchema = new mongoose.Schema(
+  {
+    userId: { ref: "User", type: mongoose.Types.ObjectId, required: true },
+    shippingAddress: { type: String, required: false },
+    items: [
+      {
+        price: { type: Number, required: true },
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+        imageUrl: { type: String, required: true },
 
-      userId: {
-        ref: "User",
-        type: mongoose.Types.ObjectId,
-        required: true,
+        userId: {
+          ref: "User",
+          type: mongoose.Types.ObjectId,
+          required: true,
+        },
+
+        quantity: { type: Number, required: true },
       },
-
-      quantity: { type: Number, required: true },
-    },
-  ],
-  totalAmount: { type: Number, required: true },
-});
+    ],
+    totalAmount: { type: Number, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Order = mongoose.model("Order", OrderSchema);
 module.exports = { Order };
