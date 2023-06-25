@@ -8,7 +8,7 @@ const {
   getCartTotal,
 } = require("../models/User");
 const { getDb } = require("../util/database");
-const { ObjectId } = require("mongodb");
+const ObjectId = require("mongoose").Types.ObjectId;
 // const CartItem = require("../models/CartItem");
 // const Order = require("../models/Order");
 // const OrderItem = require("../models/CartItem");
