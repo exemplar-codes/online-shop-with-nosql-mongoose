@@ -72,7 +72,7 @@ const postAddProduct = async (req, res, next) => {
     userId: req.user._id,
   });
 
-  product.create();
+  product.save();
 
   res.redirect("/");
 };
